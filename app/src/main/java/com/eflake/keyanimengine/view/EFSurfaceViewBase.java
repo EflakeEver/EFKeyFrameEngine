@@ -10,7 +10,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public abstract class EFSurfaceViewBase extends SurfaceView {
     private AtomicBoolean isRunning = new AtomicBoolean(true);
 
-
     public EFSurfaceViewBase(Context context) {
         super(context);
     }

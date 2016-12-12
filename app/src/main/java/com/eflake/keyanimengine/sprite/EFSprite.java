@@ -1,135 +1,105 @@
 package com.eflake.keyanimengine.sprite;
 
 import android.content.Context;
-import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Matrix;
 import android.graphics.Paint;
-import android.graphics.Rect;
-import android.graphics.drawable.Drawable;
+import android.util.Log;
 
-import com.eflake.keyanimengine.utils.Utils;
+import com.eflake.keyanimengine.base.EFNode;
+import com.eflake.keyanimengine.utils.LoadImgUtils;
 
 /**
  * 精灵类
- * 
+ *
  * @author eflake
- * 
  */
-public class EFSprite {
-	private Drawable mDrawable = null;
-	private int mPosX = 0;
-	private int mPosY = 0;
-	private int mWidth = 0;
-	private int mHeight = 0;
-	private Rect mRect;
-	private Rect mCanvasRect;
-	private Bitmap mBitmap;
-	private Context context;
+public class EFSprite extends EFNode{
+    public static final int ANCHOR_POINT_TYPE_CENTER = 0;
+    public static final int ANCHOR_POINT_TYPE_LEFT_TOP = 1;
+    public static final int ANCHOR_POINT_TYPE_LEFT_BOTTOM = 2;
+    public static final int ANCHOR_POINT_TYPE_RIGHT_TOP = 3;
+    public static final int ANCHOR_POINT_TYPE_RIGHT_BOTTOM = 4;
 
-	public int getmWidth() {
-		return mWidth;
-	}
+    public int getmWidth() {
+        return mWidth;
+    }
 
-	public void setmWidth(int mWidth) {
-		this.mWidth = mWidth;
-	}
+    public void setmWidth(int mWidth) {
+        this.mWidth = mWidth;
+    }
 
-	public int getmHeight() {
-		return mHeight;
-	}
+    public int getmHeight() {
+        return mHeight;
+    }
 
-	public void setmHeight(int mHeight) {
-		this.mHeight = mHeight;
-	}
+    public void setmHeight(int mHeight) {
+        this.mHeight = mHeight;
+    }
 
-	public EFSprite(Context context, int resId, int x, int y) {
-		mDrawable = Utils.ReadDrawable(context, resId);
-		mPosX = x;
-		mPosY = y;
-		mWidth = mDrawable.getIntrinsicWidth();
-		mHeight = mDrawable.getIntrinsicHeight();
-		// mDrawable = Utils.rotateDrawable(mDrawable, mWidth,
-		// mHeight,context.getResources());
-		mRect = new Rect(mPosX, mPosY, x + mWidth, y + mHeight);
-		mDrawable.setBounds(mRect);
-	}
+    public EFSprite(Context context, int resId, int startPosX, int startPosY) {
+        initBitmap(context, resId);
+        calculateNormalPosAndRect(startPosX, startPosY);
+    }
 
-	public EFSprite(Context context, int resId, boolean isCenter,
-					Rect canvas_rect) {
-		mDrawable = Utils.ReadDrawable(context, resId);
-		mWidth = mDrawable.getIntrinsicWidth();
-		mHeight = mDrawable.getIntrinsicHeight();
-		mRect = new Rect(canvas_rect.width() / 2 - mWidth / 2,
-				canvas_rect.height() / 2 - mHeight / 2, canvas_rect.width() / 2
-						- mWidth / 2 + mWidth, canvas_rect.height() / 2
-						- mHeight / 2 + mHeight);
-		mDrawable.setBounds(mRect);
+    public EFSprite(Context context, int resId, int anchorPosX, int anchorPosY, int anchorPointType) {
+        initBitmap(context, resId);
+        calculateAnchorPosAndRect(anchorPosX, anchorPosY, anchorPointType);
+    }
 
-	}
+    private void initBitmap(Context context, int resId) {
+        mBitmap = LoadImgUtils.ReadResourceBitMap(context, resId);
+        mHeight = mBitmap.getHeight();
+        mWidth = mBitmap.getWidth();
+    }
 
-	public EFSprite(Context context, int y, int resId,
-					boolean isCenterHorizontal, Rect canvas_rect) {
-		mDrawable = Utils.ReadDrawable(context, resId);
-		mPosY = y;
-		mWidth = mDrawable.getIntrinsicWidth();
-		mHeight = mDrawable.getIntrinsicHeight();
-		mRect = new Rect(canvas_rect.width() / 2 - mWidth / 2, mPosY,
-				canvas_rect.width() / 2 - mWidth / 2 + mWidth, mPosY + mHeight);
-		mDrawable.setBounds(mRect);
+    private void calculateNormalPosAndRect(int startPosX, int startPosY) {
+        mStartPosX = startPosX;
+        mStartPosY = startPosY;
+        mCenterPosX = mStartPosX + mWidth / 2;
+        mCenterPosY = mStartPosY + mHeight / 2;
+//        mRect = new Rect(0, 0, mWidth, mHeight);
+    }
 
-	}
+    private void calculateAnchorPosAndRect(int anchorPosX, int anchorPosY, int anchorPointType) {
+        switch (anchorPointType) {
+            case ANCHOR_POINT_TYPE_CENTER:
+                mCenterPosX = anchorPosX;
+                mCenterPosY = anchorPosY;
+                mStartPosX = mCenterPosX - mWidth / 2;
+                mStartPosY = mCenterPosY - mHeight / 2;
+                break;
+            case ANCHOR_POINT_TYPE_LEFT_TOP:
+                mStartPosX = anchorPosX;
+                mStartPosY = anchorPosY;
+                mCenterPosX = mStartPosX + mWidth / 2;
+                mCenterPosY = mStartPosY + mHeight / 2;
+                break;
+            case ANCHOR_POINT_TYPE_LEFT_BOTTOM:
+                //TODO
+                break;
+            case ANCHOR_POINT_TYPE_RIGHT_TOP:
+                //TODO
+                break;
+            case ANCHOR_POINT_TYPE_RIGHT_BOTTOM:
+                //TODO
+                break;
+        }
+        mHeight = mBitmap.getHeight();
+        mWidth = mBitmap.getWidth();
+//        mRect = new Rect(mStartPosX, mStartPosY, mStartPosX + mWidth, mStartPosY + mHeight);
+    }
 
-	public EFSprite(boolean isCenterVertical, Context context, int x,
-					int resId, Rect canvas_rect) {
-		mDrawable = Utils.ReadDrawable(context, resId);
-		mPosX = x;
-		mWidth = mDrawable.getIntrinsicWidth();
-		mHeight = mDrawable.getIntrinsicHeight();
-		mRect = new Rect(mPosX, canvas_rect.height() / 2 - mHeight / 2, mPosX
-				+ mWidth, mPosY + mHeight);
-		mDrawable.setBounds(mRect);
-	}
 
-	public EFSprite(Context context, int resId, int x, int y, Boolean isBitMap) {
-		mBitmap = Utils.ReadBitMap(context, resId);
-		mPosX = x;
-		mPosY = y;
-		mHeight = mBitmap.getHeight();
-		mWidth = mBitmap.getWidth();
-		mRect = new Rect(0, 0, mWidth, mHeight);
-	}
+    @Override
+    public void update(int deltaTime, Canvas canvas, Paint defaultPaint) {
+        Log.e("eflake","EFSprite update");
+        canvas.drawBitmap(mBitmap,getMatrix(),defaultPaint);
+//        canvas.drawBitmap(mBitmap, mStartPosX, mStartPosY, defaultPaint);
+    }
 
-	public EFSprite(Context context, int resId, boolean isCenterPosition,
-					int centX, int centY, Rect canvas_rect) {
-		mDrawable = Utils.ReadDrawable(context, resId);
-		mWidth = mDrawable.getIntrinsicWidth();
-		mHeight = mDrawable.getIntrinsicHeight();
-		mPosX = centX - mWidth / 2;
-		mPosY = centY - mHeight / 2;
-		mRect = new Rect(mPosX, mPosY, mPosX + mWidth, mPosY + mHeight);
-		mDrawable.setBounds(mRect);
-	}
-
-	public EFSprite(Context context, int resId, int x, int y, Rect canvas_rect) {
-		mBitmap = Utils.ReadBitMap(context, resId);
-		mPosX = x;
-		mPosY = y;
-		mHeight = mBitmap.getHeight();
-		mWidth = mBitmap.getWidth();
-		mRect = new Rect(0, 0, mWidth, mHeight);
-		mCanvasRect = canvas_rect;
-	}
-
-	public void DrawDrawableSprite(Canvas canvas, Paint paint) {
-		mDrawable.draw(canvas);
-	}
-
-	public void DrawBitmapFilledSprite(Canvas canvas, Paint paint) {
-		canvas.drawBitmap(mBitmap, mRect, mCanvasRect, paint);
-	}
-
-	public void DrawBitmapSprite(Canvas canvas, Paint paint) {
-		canvas.drawBitmap(mBitmap, mPosX, mPosY, paint);
-	}
-
+    private Matrix getMatrix() {
+        mMatrix = new Matrix();
+        return mMatrix;
+    }
 }
