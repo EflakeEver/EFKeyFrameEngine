@@ -1,10 +1,10 @@
 package com.eflake.keyanimengine.sprite;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Matrix;
 import android.graphics.Paint;
-import android.util.Log;
 
 import com.eflake.keyanimengine.base.EFNode;
 import com.eflake.keyanimengine.utils.LoadImgUtils;
@@ -14,46 +14,64 @@ import com.eflake.keyanimengine.utils.LoadImgUtils;
  *
  * @author eflake
  */
-public class EFSprite extends EFNode{
+public class EFSprite extends EFNode implements IEFSprite {
     public static final int ANCHOR_POINT_TYPE_CENTER = 0;
     public static final int ANCHOR_POINT_TYPE_LEFT_TOP = 1;
     public static final int ANCHOR_POINT_TYPE_LEFT_BOTTOM = 2;
     public static final int ANCHOR_POINT_TYPE_RIGHT_TOP = 3;
     public static final int ANCHOR_POINT_TYPE_RIGHT_BOTTOM = 4;
+    public Bitmap mBitmap;//位图
+    public Matrix mMatrix;//变换矩阵
 
-    public int getmWidth() {
-        return mWidth;
+    /*
+    * Path
+    * */
+    public EFSprite(Context context, String path, int startPosX, int startPosY) {
+        initBitmapPath(context, path);
+        calculateNormalPosAndRect(startPosX, startPosY);
     }
 
-    public void setmWidth(int mWidth) {
-        this.mWidth = mWidth;
+    public EFSprite(Context context, String path, int anchorPosX, int anchorPosY, int anchorPointType) {
+        initBitmapPath(context, path);
+        calculateAnchorPosAndRect(anchorPosX, anchorPosY, anchorPointType);
     }
 
-    public int getmHeight() {
-        return mHeight;
+    @Override
+    public void initBitmapPath(Context context, String path) {
+        mBitmap = LoadImgUtils.ReadFileBitMap(context, path);
+        if (mBitmap != null) {
+            mHeight = mBitmap.getHeight();
+            mWidth = mBitmap.getWidth();
+        }
     }
 
-    public void setmHeight(int mHeight) {
-        this.mHeight = mHeight;
-    }
-
+    /*
+    * Res
+    * */
     public EFSprite(Context context, int resId, int startPosX, int startPosY) {
-        initBitmap(context, resId);
+        initBitmapRes(context, resId);
         calculateNormalPosAndRect(startPosX, startPosY);
     }
 
     public EFSprite(Context context, int resId, int anchorPosX, int anchorPosY, int anchorPointType) {
-        initBitmap(context, resId);
+        initBitmapRes(context, resId);
         calculateAnchorPosAndRect(anchorPosX, anchorPosY, anchorPointType);
     }
 
-    private void initBitmap(Context context, int resId) {
+    @Override
+    public void initBitmapRes(Context context, int resId) {
         mBitmap = LoadImgUtils.ReadResourceBitMap(context, resId);
-        mHeight = mBitmap.getHeight();
-        mWidth = mBitmap.getWidth();
+        if (mBitmap != null) {
+            mHeight = mBitmap.getHeight();
+            mWidth = mBitmap.getWidth();
+        }
     }
 
-    private void calculateNormalPosAndRect(int startPosX, int startPosY) {
+    /*
+    * Position
+    * */
+    @Override
+    public void calculateNormalPosAndRect(int startPosX, int startPosY) {
         mStartPosX = startPosX;
         mStartPosY = startPosY;
         mCenterPosX = mStartPosX + mWidth / 2;
@@ -61,7 +79,8 @@ public class EFSprite extends EFNode{
 //        mRect = new Rect(0, 0, mWidth, mHeight);
     }
 
-    private void calculateAnchorPosAndRect(int anchorPosX, int anchorPosY, int anchorPointType) {
+    @Override
+    public void calculateAnchorPosAndRect(int anchorPosX, int anchorPosY, int anchorPointType) {
         switch (anchorPointType) {
             case ANCHOR_POINT_TYPE_CENTER:
                 mCenterPosX = anchorPosX;
@@ -92,14 +111,16 @@ public class EFSprite extends EFNode{
 
 
     @Override
-    public void update(int deltaTime, Canvas canvas, Paint defaultPaint) {
-        Log.e("eflake","EFSprite update");
-        canvas.drawBitmap(mBitmap,getMatrix(),defaultPaint);
-//        canvas.drawBitmap(mBitmap, mStartPosX, mStartPosY, defaultPaint);
+    public void update(int deltaTime) {
     }
 
     private Matrix getMatrix() {
         mMatrix = new Matrix();
         return mMatrix;
+    }
+
+    @Override
+    public void draw(Canvas canvas, Paint defaultPaint) {
+        canvas.drawBitmap(mBitmap, mStartPosX, mStartPosY, defaultPaint);
     }
 }

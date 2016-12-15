@@ -51,7 +51,7 @@ public class EFSurfaceView extends EFSurfaceViewBase implements SurfaceHolder.Ca
         mSurfaceHolder.addCallback(this);
         initDefaultPaint();
         initSurfaceHolder(mSurfaceHolder);
-        initBitMap();
+        initSprite();
     }
 
     private void initDefaultPaint() {
@@ -105,6 +105,7 @@ public class EFSurfaceView extends EFSurfaceViewBase implements SurfaceHolder.Ca
                 draw();
             }
             long endTime = System.currentTimeMillis();
+//            Log.e("eflake", "draw time = " + (endTime - startTime));
             mDeltaTime = REFRESH_SLEEP_TIME - (endTime - startTime);
             try {
                 Thread.sleep(mDeltaTime);
@@ -117,7 +118,7 @@ public class EFSurfaceView extends EFSurfaceViewBase implements SurfaceHolder.Ca
     /*
     * 初始化图片资源
     * */
-    protected void initBitMap() {
+    protected void initSprite() {
     }
 
     /*

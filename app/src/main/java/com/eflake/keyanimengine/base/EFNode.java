@@ -1,11 +1,7 @@
 package com.eflake.keyanimengine.base;
 
-import android.graphics.Bitmap;
 import android.graphics.Canvas;
-import android.graphics.Matrix;
 import android.graphics.Paint;
-
-import com.eflake.keyanimengine.action.EFAction;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,16 +13,19 @@ import java.util.List;
  */
 public class EFNode implements IEFNode {
     public List<EFNode> children = new ArrayList<>();
-    public String mTag;
-    public int mCenterPosY;
-    public int mCenterPosX;
-    public int mStartPosX = 0;
-    public int mStartPosY = 0;
-    public int mWidth = 0;
-    public int mHeight = 0;
-    public Bitmap mBitmap;
-    public Matrix mMatrix;
-    public boolean mIsNeedPaused;
+    public String mTag;//标签
+    public int mParentPosX;//X轴相对坐标
+    public int mParentPosY;//Y轴相对坐标
+    public int mCenterPosX;//X轴中心坐标
+    public int mCenterPosY;//Y轴中心坐标
+    public int mStartPosX;//X轴左上角坐标
+    public int mStartPosY;//Y轴左上角坐标
+    public int mWidth;//宽度
+    public int mHeight;//高度
+    public int mRotation;//旋转角度
+    public float mAlpha;//不透明度
+    public float mScale;//缩放比例
+    public boolean mShowing;//是否显示
 
     @Override
     public void addChild(EFNode node) {
@@ -43,10 +42,6 @@ public class EFNode implements IEFNode {
 
     }
 
-    @Override
-    public void runAction(EFAction action) {
-
-    }
 
     @Override
     public String getTag() {
@@ -59,23 +54,22 @@ public class EFNode implements IEFNode {
     }
 
     @Override
-    public void update(int deltaTime, Canvas canvas, Paint defaultPaint) {
-
-    }
-
-    @Override
     public void pause(boolean isNeedPause) {
-        mIsNeedPaused = isNeedPause;
+        mShowing = isNeedPause;
     }
 
     @Override
     public boolean isPaused() {
-        return mIsNeedPaused;
+        return mShowing;
+    }
+
+    @Override
+    public void update(int deltaTime) {
+
     }
 
     @Override
     public void draw(Canvas canvas, Paint defaultPaint) {
-
     }
 
     @Override

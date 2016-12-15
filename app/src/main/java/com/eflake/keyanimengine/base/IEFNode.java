@@ -4,8 +4,6 @@ package com.eflake.keyanimengine.base;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 
-import com.eflake.keyanimengine.action.EFAction;
-
 public interface IEFNode {
     void addChild(EFNode node);
 
@@ -13,13 +11,11 @@ public interface IEFNode {
 
     void removeAllChild(EFNode node);
 
-    void runAction(EFAction action);
-
     String getTag();
 
     void setTag(String tag);
 
-    void update(int deltaTime, Canvas canvas, Paint defaultPaint);
+    void update(int deltaTime);
 
     void pause(boolean isNeedPause);
 

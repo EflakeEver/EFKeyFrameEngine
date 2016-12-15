@@ -5,7 +5,14 @@ import android.graphics.Bitmap;
 import android.graphics.Bitmap.Config;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
+import android.os.Environment;
 import android.util.Log;
+
+import java.io.File;
+
+import static android.content.ContentValues.TAG;
+import static com.eflake.keyanimengine.sprite.EFSpriteFrameCache.KSYUN_FRAMES;
+import static com.eflake.keyanimengine.view.TransparentSurfaceView.PNG;
 
 /**
  * 工具类
@@ -86,6 +93,25 @@ public class LoadImgUtils {
             inSampleSize = (int) Math.min(ratioWidth, ratioHeight);
         }
         return inSampleSize;
+    }
+
+    public static String getAppDir() {
+        File fileDir = Environment.getExternalStorageDirectory();
+        if (fileDir == null) {
+            Log.e(TAG, "External Storage ERROR!!!!!!");
+            return null;
+        }
+        if (!fileDir.exists()) {
+            Log.e(TAG, "media not exists!");
+            return null;
+        }
+        String appDir = fileDir.getAbsolutePath();
+        //LogUtil.e(TAG, "create file" + appDir);
+        return appDir;
+    }
+
+    public static String getFrameAnimPath(String fileName) {
+        return LoadImgUtils.getAppDir() + File.separator + KSYUN_FRAMES + File.separator + fileName + PNG;
     }
 
 }
