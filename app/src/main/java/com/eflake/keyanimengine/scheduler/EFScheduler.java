@@ -2,7 +2,8 @@ package com.eflake.keyanimengine.scheduler;
 
 import android.graphics.Canvas;
 import android.graphics.Paint;
-import android.util.Log;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffXfermode;
 
 import com.eflake.keyanimengine.keyframe.EFAnimManager;
 
@@ -80,8 +81,13 @@ public class EFScheduler implements IEFScheduler {
                 observer.update(deltaTime);
             }
         }
-        Log.e(TAG, "update cost time = " + String.valueOf(System.currentTimeMillis() - oldUpdateTime));
+//        Log.e(TAG, "update cost time = " + String.valueOf(System.currentTimeMillis() - oldUpdateTime));
         long oldDrawTime = System.currentTimeMillis();
+        //清屏操作
+        defaultPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
+        canvas.drawPaint(defaultPaint);
+        defaultPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC));
+
         Iterator drawIterator = observers.entrySet().iterator();
         while (drawIterator.hasNext()) {
             Map.Entry<String, IEFUpdate> entry = (Map.Entry<String, IEFUpdate>) drawIterator.next();
@@ -90,7 +96,7 @@ public class EFScheduler implements IEFScheduler {
                 observer.draw(canvas, defaultPaint);
             }
         }
-        Log.e(TAG, "draw cost time = " + String.valueOf(System.currentTimeMillis() - oldUpdateTime));
+//        Log.e(TAG, "draw cost time = " + String.valueOf(System.currentTimeMillis() - oldUpdateTime));
     }
     
 }

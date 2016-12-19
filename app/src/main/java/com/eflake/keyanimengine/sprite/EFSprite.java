@@ -2,9 +2,7 @@ package com.eflake.keyanimengine.sprite;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.Canvas;
 import android.graphics.Matrix;
-import android.graphics.Paint;
 
 import com.eflake.keyanimengine.base.EFNode;
 import com.eflake.keyanimengine.utils.LoadImgUtils;
@@ -110,17 +108,15 @@ public class EFSprite extends EFNode implements IEFSprite {
     }
 
 
-    @Override
-    public void update(int deltaTime) {
-    }
-
-    private Matrix getMatrix() {
-        mMatrix = new Matrix();
+    protected Matrix getMatrix() {
+        if (mMatrix == null) {
+            mMatrix = new Matrix();
+        }
         return mMatrix;
     }
 
-    @Override
-    public void draw(Canvas canvas, Paint defaultPaint) {
-        canvas.drawBitmap(mBitmap, mStartPosX, mStartPosY, defaultPaint);
+    protected Bitmap getBitmap() {
+        return mBitmap;
     }
+
 }

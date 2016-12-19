@@ -1,6 +1,9 @@
 package com.eflake.keyanimengine.keyframe;
 
 
+import android.graphics.Canvas;
+import android.graphics.Paint;
+
 public interface IEFAnim {
     void setDuration(long duration);
 
@@ -28,4 +31,5 @@ public interface IEFAnim {
 
     String getName();
 
+    void draw(Canvas canvas, Paint defaultPaint);
 }

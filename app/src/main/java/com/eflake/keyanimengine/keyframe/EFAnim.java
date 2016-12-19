@@ -1,6 +1,9 @@
 package com.eflake.keyanimengine.keyframe;
 
 
+import android.graphics.Canvas;
+import android.graphics.Paint;
+
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -12,6 +15,7 @@ public class EFAnim implements IEFAnim {
     public long mElapsedFrame;//动画已运行帧数
     public EFViewPort mViewport;//显示的ViewPort
     public boolean mIsRunning;//动画是否正在执行
+    public boolean mIsAnimStartFrame;
 
     @Override
     public void setDuration(long duration) {
@@ -57,13 +61,12 @@ public class EFAnim implements IEFAnim {
 
     @Override
     public void step(long deltaTime) {
-        mElapsedFrame++;
         Iterator<Map.Entry<String, EFElement>> iterator = mElements.entrySet().iterator();
         while (iterator.hasNext()) {
             Map.Entry<String, EFElement> entry = iterator.next();
-            EFElement currentElement = entry.getValue();
-            currentElement.updateAnim(mElapsedFrame);
+            entry.getValue().updateAnim(mElapsedFrame);
         }
+        mElapsedFrame++;
     }
 
     @Override
@@ -89,5 +92,14 @@ public class EFAnim implements IEFAnim {
     @Override
     public String getName() {
         return mName;
+    }
+
+    @Override
+    public void draw(Canvas canvas, Paint defaultPaint) {
+        Iterator<Map.Entry<String, EFElement>> iterator = mElements.entrySet().iterator();
+        while (iterator.hasNext()) {
+            Map.Entry<String, EFElement> entry = iterator.next();
+            entry.getValue().draw(canvas, defaultPaint);
+        }
     }
 }

@@ -18,7 +18,7 @@ public interface IEFElement {
 
 //    void setAnimListener(AnimListener listener);
 
-    void updateAnim(long frameIndex);
+    void updateAnim(long allAnimFrameIndex);
 
-
+    void setAnimListener(IEFAnimListener listener);
 }

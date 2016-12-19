@@ -9,6 +9,8 @@ import android.view.SurfaceHolder;
 import com.eflake.keyanimengine.keyframe.EFAnim;
 import com.eflake.keyanimengine.keyframe.EFAnimManager;
 import com.eflake.keyanimengine.keyframe.EFElement;
+import com.eflake.keyanimengine.keyframe.EFKeyFrame;
+import com.eflake.keyanimengine.main.R;
 import com.eflake.keyanimengine.sprite.EFSprite;
 import com.eflake.keyanimengine.utils.LoadImgUtils;
 
@@ -71,26 +73,29 @@ public class TransparentSurfaceView extends EFSurfaceView {
         long endTime = System.currentTimeMillis();
         Log.e("eflake", "sprite frame load time = " + (endTime - startTime));*/
 
-        //Anim关键帧动画场景一,平移动画+旋转动画
-        /*try {
-            //TODO 动画描述文件JSON解析
-            JSONObject jsonObject = new JSONObject("{}");
-            EFAnim anim = new EFAnim();
-            anim.setDuration(300);
-            //TODO 加载动画描述文件之前,需要确保动画资源文件已经下载完毕
-            EFElement element_first = new EFElement(mContext, getFramePathByName(getFireworkName(48)), 100, 100);
-            element_first.addPathKeyFrame(new EFKeyFrame(0, 120, "100"));
-            element_first.addPathKeyFrame(new EFKeyFrame(1, 240, "200"));
-            element_first.addRotationKeyFrame(new EFKeyFrame(0, 120, "30"));
-            element_first.addRotationKeyFrame(new EFKeyFrame(1, 240, "90"));
-            anim.addElement(KEY_SINGLE_ELEMENT, element_first);
-            EFAnimManager.getInstance().addAnim(KEY_SINGLE_ANIM, anim);
-            EFAnimManager.getInstance().startAnimByKey(KEY_SINGLE_ANIM);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }*/
+        //Anim关键帧动画场景一,红包动画
+        //TODO 动画描述文件JSON解析
+        //JSONObject jsonObject = new JSONObject("");
+        EFAnim anim = new EFAnim();
+        anim.setDuration(1700);
+        //TODO 加载动画描述文件之前,需要确保动画资源文件已经下载完毕
+        EFElement element_first = new EFElement(mContext, R.mipmap.mitao, 0, 0);
+        element_first.addPositionKeyFrame(new EFKeyFrame(0, 1, "200.0,-400.0"));
+        element_first.addPositionKeyFrame(new EFKeyFrame(1, 48, "200.0,400.0"));
+//        element_first.addRotationKeyFrame(new EFKeyFrame(0, 120, "30"));
+//        element_first.addRotationKeyFrame(new EFKeyFrame(1, 240, "90"));
+        anim.addElement(KEY_SINGLE_ELEMENT, element_first);
+        EFAnimManager.getInstance().addAnim(KEY_SINGLE_ANIM, anim);
 
-        for (int i = 0; i < 3; i++) {
+//        postDelayed(new Runnable() {
+//            @Override
+//            public void run() {
+                EFAnimManager.getInstance().startAnimByKey(KEY_SINGLE_ANIM);
+//            }
+//        }, 1000 * 3);
+
+
+        /*for (int i = 0; i < 3; i++) {
             EFAnim anim = new EFAnim();
             anim.setDuration(100);
             anim.setName("anim"+i);
@@ -104,6 +109,7 @@ public class TransparentSurfaceView extends EFSurfaceView {
         EFAnimManager.getInstance().startAnimByKey(KEY_SINGLE_ANIM + "_" + 0);
         EFAnimManager.getInstance().startAnimByKey(KEY_SINGLE_ANIM + "_" + 1);
         EFAnimManager.getInstance().startAnimByKey(KEY_SINGLE_ANIM + "_" + 2);
+        */
 
     }
 

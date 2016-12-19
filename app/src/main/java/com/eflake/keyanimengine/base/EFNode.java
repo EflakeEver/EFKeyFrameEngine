@@ -1,8 +1,5 @@
 package com.eflake.keyanimengine.base;
 
-import android.graphics.Canvas;
-import android.graphics.Paint;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,12 +11,10 @@ import java.util.List;
 public class EFNode implements IEFNode {
     public List<EFNode> children = new ArrayList<>();
     public String mTag;//标签
-    public int mParentPosX;//X轴相对坐标
-    public int mParentPosY;//Y轴相对坐标
-    public int mCenterPosX;//X轴中心坐标
-    public int mCenterPosY;//Y轴中心坐标
-    public int mStartPosX;//X轴左上角坐标
-    public int mStartPosY;//Y轴左上角坐标
+    public float mCenterPosX;//X轴中心坐标
+    public float mCenterPosY;//Y轴中心坐标
+    public float mStartPosX;//X轴左上角坐标
+    public float mStartPosY;//Y轴左上角坐标
     public int mWidth;//宽度
     public int mHeight;//高度
     public int mRotation;//旋转角度
@@ -64,15 +59,6 @@ public class EFNode implements IEFNode {
     }
 
     @Override
-    public void update(int deltaTime) {
-
-    }
-
-    @Override
-    public void draw(Canvas canvas, Paint defaultPaint) {
-    }
-
-    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
@@ -92,5 +78,22 @@ public class EFNode implements IEFNode {
         return result;
     }
 
+    protected void setCenterPosX(float centerPosX) {
+        mCenterPosX = centerPosX;
+        mStartPosX = mCenterPosX - mWidth / 2;
+    }
 
+    protected void setCenterPosY(float centerPosY) {
+        mCenterPosY = centerPosY;
+        mStartPosY = centerPosY - mHeight / 2;
+    }
+
+    protected void setRotation(int rotation) {
+        mRotation = rotation;
+    }
+
+    protected void setAlpha(int alpha) {
+        //TODO 这里的参数alpha一般是百分比数字(不含百分号),如果是设置给Paint,只能是[0,255]区间,需要考虑转化
+        mAlpha = alpha;
+    }
 }

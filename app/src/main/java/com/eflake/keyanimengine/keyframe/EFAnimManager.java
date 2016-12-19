@@ -82,6 +82,20 @@ public class EFAnimManager implements IEFAnimManager, IEFUpdate {
 
     @Override
     public void draw(Canvas canvas, Paint defaultPaint) {
+        Iterator<Map.Entry<String, EFAnim>> iterator = mAnims.entrySet().iterator();
+        while (iterator.hasNext()) {
+            Map.Entry<String, EFAnim> entry = iterator.next();
+            EFAnim currentAnim = entry.getValue();
+            //检查动画是否已经完成,如果完成,则从Map中移除
+            if (currentAnim.isDone()) {
+                currentAnim.setIsRunning(false);
+                removeAnimByKey(entry.getKey());
+            }
+            //如果动画正在进行,则调用step方法
+            if (currentAnim.isRunning()) {
+                currentAnim.draw(canvas,defaultPaint);
+            }
+        }
     }
 
     @Override
