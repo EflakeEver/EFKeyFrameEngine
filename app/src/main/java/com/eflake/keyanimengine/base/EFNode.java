@@ -9,6 +9,7 @@ import java.util.List;
  * 一个子节点,只能拥有一个父节点
  */
 public class EFNode implements IEFNode {
+    public EFNode mParentNode;
     public List<EFNode> children = new ArrayList<>();
     public String mTag;//标签
     public float mCenterPosX;//X轴中心坐标
@@ -85,7 +86,37 @@ public class EFNode implements IEFNode {
 
     protected void setCenterPosY(float centerPosY) {
         mCenterPosY = centerPosY;
-        mStartPosY = centerPosY - mHeight / 2;
+        mStartPosY = mCenterPosY - mHeight / 2;
+    }
+
+    /*
+    * X相对坐标转绝对坐标
+    * */
+    protected void convertRelativeToRealPosX() {
+        //如果在设置之前的计算，全是基于相对坐标，那么最后在设置真正坐标时，需要把相对坐标转化成绝对坐标
+        if (getParentNode() != null) {
+            mCenterPosX = mCenterPosX + getParentNode().mCenterPosX;
+            mStartPosX = mCenterPosX - mWidth / 2;
+        }
+    }
+
+    /*
+    * Y相对坐标转绝对坐标
+    * */
+    protected void convertRelativeToRealPosY() {
+        //如果在设置之前的计算，全是基于相对坐标，那么最后在设置真正坐标时，需要把相对坐标转化成绝对坐标
+        if (getParentNode() != null) {
+            mCenterPosY = mCenterPosY + getParentNode().mCenterPosY;
+            mStartPosY = mCenterPosY - mHeight / 2;
+        }
+    }
+
+    /*
+    * 如果计算的坐标是相对坐标，转换成绝对坐标
+    * */
+    protected void convertRelativeToRealPos() {
+        convertRelativeToRealPosX();
+        convertRelativeToRealPosY();
     }
 
     protected void setRotation(int rotation) {
@@ -93,7 +124,18 @@ public class EFNode implements IEFNode {
     }
 
     protected void setAlpha(int alpha) {
-        //TODO 这里的参数alpha一般是百分比数字(不含百分号),如果是设置给Paint,只能是[0,255]区间,需要考虑转化
+        //TODO 这里的参数alpha,传入时一般是百分比数字(不含百分号),如果是设置给Paint,只能是[0,255]区间,需要考虑转化
         mAlpha = alpha;
+    }
+
+    public EFNode getParentNode() {
+        return mParentNode;
+    }
+
+    public void setParentNode(EFNode parentNode) {
+        //设置父节点之前，先将设置坐标为父节点中心位置
+        setCenterPosX(parentNode.mCenterPosX);
+        setCenterPosY(parentNode.mCenterPosY);
+        mParentNode = parentNode;
     }
 }

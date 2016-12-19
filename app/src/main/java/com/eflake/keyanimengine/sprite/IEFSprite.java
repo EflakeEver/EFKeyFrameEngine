@@ -8,7 +8,7 @@ public interface IEFSprite {
 
     void initBitmapRes(Context context, int resId);
 
-    void calculateNormalPosAndRect(int startPosX, int startPosY);
+    void calculateNormalPosAndRect(float startPosX, float startPosY);
 
-    void calculateAnchorPosAndRect(int anchorPosX, int anchorPosY, int anchorPointType);
+    void calculateAnchorPosAndRect(float anchorPosX, float anchorPosY, int anchorPointType);
 }

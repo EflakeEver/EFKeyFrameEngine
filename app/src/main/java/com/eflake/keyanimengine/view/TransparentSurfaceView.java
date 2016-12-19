@@ -19,8 +19,10 @@ public class TransparentSurfaceView extends EFSurfaceView {
 
     public static final String PNG = ".png";
     public static final int FIREWORKS_FILE_SIZE = 63;
-    public static final String KEY_SINGLE_ELEMENT = "single_element";
     public static final String KEY_SINGLE_ANIM = "single_anim";
+    public static final String KEY_PARENT_ELEMENT = "parent_element";
+    private static final String KEY_CHILD_ELEMENT = "child_element";
+    private static final String KEY_RED_PACKET_ELEMENT = "red_packet_element";
     private EFSprite mCucumberResSprite;
     private EFSprite mCucumberResAnchorSprite;
     private EFSprite mFireworkFileSprite;
@@ -73,43 +75,45 @@ public class TransparentSurfaceView extends EFSurfaceView {
         long endTime = System.currentTimeMillis();
         Log.e("eflake", "sprite frame load time = " + (endTime - startTime));*/
 
-        //Anim关键帧动画场景一,红包动画
+        //Anim关键帧动画场景一,红包动画实现
         //TODO 动画描述文件JSON解析
         //JSONObject jsonObject = new JSONObject("");
-        EFAnim anim = new EFAnim();
-        anim.setDuration(1700);
+        /*EFAnim anim = new EFAnim();
+        anim.setDuration(170);
+        anim.setViewPort(new EFViewPort(1080, 1920));
+        EFElement element_parent = new EFElement(mContext, R.mipmap.red_packet, 0.0f, 0.0f, 810.0f, 615.0f);
+        element_parent.addPositionKeyFrame(new EFKeyFrame(0, 1, "540.0,-500.0"));
+        element_parent.addPositionKeyFrame(new EFKeyFrame(0, 2, "540.0,244.0"));
+        anim.addElement(KEY_RED_PACKET_ELEMENT, element_parent);
+
+        EFAnimManager.getInstance().addAnim(KEY_SINGLE_ANIM, anim);*/
+
         //TODO 加载动画描述文件之前,需要确保动画资源文件已经下载完毕
-        EFElement element_first = new EFElement(mContext, R.mipmap.mitao, 0, 0);
-        element_first.addPositionKeyFrame(new EFKeyFrame(0, 1, "200.0,-400.0"));
-        element_first.addPositionKeyFrame(new EFKeyFrame(1, 48, "200.0,400.0"));
+
+        EFAnim anim = new EFAnim();
+        EFElement element_parent = new EFElement(mContext, R.mipmap.mitao, 0, 0);
+        element_parent.addPositionKeyFrame(new EFKeyFrame(0, 1, "200.0,-400.0"));
+        element_parent.addPositionKeyFrame(new EFKeyFrame(1, 48, "200.0,400.0"));
+        element_parent.addPositionKeyFrame(new EFKeyFrame(2, 88, "1200.0,400.0"));
+        element_parent.addPositionKeyFrame(new EFKeyFrame(3, 128, "1200.0,-400.0"));
 //        element_first.addRotationKeyFrame(new EFKeyFrame(0, 120, "30"));
 //        element_first.addRotationKeyFrame(new EFKeyFrame(1, 240, "90"));
-        anim.addElement(KEY_SINGLE_ELEMENT, element_first);
+        anim.addElement(KEY_PARENT_ELEMENT, element_parent);
+
+        EFElement element_child = new EFElement(mContext, R.mipmap.cucumber, 0, 0);
+        element_child.addPositionKeyFrame(new EFKeyFrame(0, 1, "0.0,0.0"));
+//        element_child.addPositionKeyFrame(new EFKeyFrame(1, 88, "100.0,0.0"));
+        element_child.setParentNode(element_parent);
+        anim.addElement(KEY_CHILD_ELEMENT, element_child);
+
         EFAnimManager.getInstance().addAnim(KEY_SINGLE_ANIM, anim);
 
 //        postDelayed(new Runnable() {
 //            @Override
 //            public void run() {
-                EFAnimManager.getInstance().startAnimByKey(KEY_SINGLE_ANIM);
+        EFAnimManager.getInstance().startAnimByKey(KEY_SINGLE_ANIM);
 //            }
 //        }, 1000 * 3);
-
-
-        /*for (int i = 0; i < 3; i++) {
-            EFAnim anim = new EFAnim();
-            anim.setDuration(100);
-            anim.setName("anim"+i);
-            for (int j = 0; j < 2; j++) {
-                EFElement element_first = new EFElement(mContext, getFramePathByName(getFireworkName(48)), 100, 100);
-                element_first.setName("element"+i+j);
-                anim.addElement("index" + j, element_first);
-            }
-            EFAnimManager.getInstance().addAnim(KEY_SINGLE_ANIM + "_" + i, anim);
-        }
-        EFAnimManager.getInstance().startAnimByKey(KEY_SINGLE_ANIM + "_" + 0);
-        EFAnimManager.getInstance().startAnimByKey(KEY_SINGLE_ANIM + "_" + 1);
-        EFAnimManager.getInstance().startAnimByKey(KEY_SINGLE_ANIM + "_" + 2);
-        */
 
     }
 

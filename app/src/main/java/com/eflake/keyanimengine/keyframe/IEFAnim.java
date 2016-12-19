@@ -23,9 +23,9 @@ public interface IEFAnim {
 
     boolean isDone();
 
-    int getViewPortPosX(int currentPosX);
+    float getViewPortPosX(float currentPosX);
 
-    int getViewPortPosY(int currentPosY);
+    float getViewPortPosY(float currentPosY);
 
     void setName(String name);
 

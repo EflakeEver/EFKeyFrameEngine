@@ -4,6 +4,8 @@ package com.eflake.keyanimengine.keyframe;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 
+import com.eflake.keyanimengine.utils.ScreenDimenUtils;
+
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -75,13 +77,13 @@ public class EFAnim implements IEFAnim {
     }
 
     @Override
-    public int getViewPortPosX(int currentPosX) {
-        return 0;
+    public float getViewPortPosX(float currentPosX) {
+        return ScreenDimenUtils.getDeviceWidth() / mViewport.widthPixel * currentPosX;
     }
 
     @Override
-    public int getViewPortPosY(int currentPosY) {
-        return 0;
+    public float getViewPortPosY(float currentPosY) {
+        return ScreenDimenUtils.getDeviceHeight() / mViewport.heightPixel * currentPosY;
     }
 
     @Override

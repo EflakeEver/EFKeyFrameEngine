@@ -13,7 +13,6 @@ import android.view.SurfaceHolder;
 
 import com.eflake.keyanimengine.main.R;
 import com.eflake.keyanimengine.scheduler.EFScheduler;
-import com.eflake.keyanimengine.sprite.EFSprite;
 import com.eflake.keyanimengine.utils.LoadImgUtils;
 
 public class EFSurfaceView extends EFSurfaceViewBase implements SurfaceHolder.Callback, Runnable {
@@ -27,9 +26,8 @@ public class EFSurfaceView extends EFSurfaceViewBase implements SurfaceHolder.Ca
     protected Context mContext;
     private Paint mDefaultPaint;
     private long mDeltaTime = REFRESH_SLEEP_TIME;
-    private EFSprite mCucumberResAnchorSprite;
     public Bitmap mBitmap;
-    public int mPostionX = 100;
+    public int mPositionX = 100;
     public int mPositionY = 100;
     public Matrix mMatrix;
     public Rect mRect;
@@ -62,7 +60,7 @@ public class EFSurfaceView extends EFSurfaceViewBase implements SurfaceHolder.Ca
         mSurfaceHolder.addCallback(this);
         mBitmap = LoadImgUtils.ReadResourceBitMap(mContext, R.mipmap.red_packet);
         mMatrix = new Matrix();
-        mRect = new Rect(mPostionX, mPositionY, mBitmap.getWidth(), mBitmap.getHeight());
+        mRect = new Rect(mPositionX, mPositionY, mBitmap.getWidth(), mBitmap.getHeight());
         initDefaultPaint();
         initSurfaceHolder(mSurfaceHolder);
         initSprite();

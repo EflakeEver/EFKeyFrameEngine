@@ -2,6 +2,11 @@ package com.eflake.keyanimengine.keyframe;
 
 
 public class EFViewPort {
-    public int widthPixel;
-    public int heightPixel;
+    public float widthPixel;
+    public float heightPixel;
+
+    public EFViewPort(float width, float height) {
+        widthPixel = width;
+        heightPixel = height;
+    }
 }

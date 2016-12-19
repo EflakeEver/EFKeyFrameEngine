@@ -16,9 +16,11 @@ public interface IEFElement {
 
     void addPathKeyFrame(EFKeyFrame pathKeyFrame);
 
-//    void setAnimListener(AnimListener listener);
-
     void updateAnim(long allAnimFrameIndex);
 
     void setAnimListener(IEFAnimListener listener);
+
+    EFAnim getAnim();
+
+    void setAnim(EFAnim anim);
 }

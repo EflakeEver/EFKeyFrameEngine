@@ -24,14 +24,24 @@ public class EFSprite extends EFNode implements IEFSprite {
     /*
     * Path
     * */
-    public EFSprite(Context context, String path, int startPosX, int startPosY) {
+    public EFSprite(Context context, String path, float startPosX, float startPosY) {
         initBitmapPath(context, path);
         calculateNormalPosAndRect(startPosX, startPosY);
     }
 
-    public EFSprite(Context context, String path, int anchorPosX, int anchorPosY, int anchorPointType) {
+    public EFSprite(Context context, String path, float anchorPosX, float anchorPosY, int anchorPointType) {
         initBitmapPath(context, path);
         calculateAnchorPosAndRect(anchorPosX, anchorPosY, anchorPointType);
+    }
+
+    public EFSprite(Context context, String path, float startPosX, float startPosY, float width, float height) {
+        initBitmapPathWithScale(context, path,width,height);
+        calculateNormalPosAndRect(startPosX, startPosY);
+    }
+
+    public EFSprite(Context context, int resId, float startPosX, float startPosY, float width, float height) {
+        initBitmapResWithScale(context,resId,width,height);
+        calculateNormalPosAndRect(startPosX, startPosY);
     }
 
     @Override
@@ -43,15 +53,23 @@ public class EFSprite extends EFNode implements IEFSprite {
         }
     }
 
+    private void initBitmapPathWithScale(Context context, String path, float width, float height) {
+        mBitmap = LoadImgUtils.ReadFileBitMap(context, path,width,height);
+        if (mBitmap != null) {
+            mHeight = mBitmap.getHeight();
+            mWidth = mBitmap.getWidth();
+        }
+    }
+
     /*
     * Res
     * */
-    public EFSprite(Context context, int resId, int startPosX, int startPosY) {
+    public EFSprite(Context context, int resId, float startPosX, float startPosY) {
         initBitmapRes(context, resId);
         calculateNormalPosAndRect(startPosX, startPosY);
     }
 
-    public EFSprite(Context context, int resId, int anchorPosX, int anchorPosY, int anchorPointType) {
+    public EFSprite(Context context, int resId, float anchorPosX, float anchorPosY, int anchorPointType) {
         initBitmapRes(context, resId);
         calculateAnchorPosAndRect(anchorPosX, anchorPosY, anchorPointType);
     }
@@ -65,20 +83,29 @@ public class EFSprite extends EFNode implements IEFSprite {
         }
     }
 
+
+    private void initBitmapResWithScale(Context context, int resId, float width, float height) {
+        mBitmap = LoadImgUtils.ReadResourceBitMapWithScale(context, resId,width,height);
+        if (mBitmap != null) {
+            mHeight = mBitmap.getHeight();
+            mWidth = mBitmap.getWidth();
+        }
+    }
+
+
     /*
     * Position
     * */
     @Override
-    public void calculateNormalPosAndRect(int startPosX, int startPosY) {
+    public void calculateNormalPosAndRect(float startPosX, float startPosY) {
         mStartPosX = startPosX;
         mStartPosY = startPosY;
         mCenterPosX = mStartPosX + mWidth / 2;
         mCenterPosY = mStartPosY + mHeight / 2;
-//        mRect = new Rect(0, 0, mWidth, mHeight);
     }
 
     @Override
-    public void calculateAnchorPosAndRect(int anchorPosX, int anchorPosY, int anchorPointType) {
+    public void calculateAnchorPosAndRect(float anchorPosX, float anchorPosY, int anchorPointType) {
         switch (anchorPointType) {
             case ANCHOR_POINT_TYPE_CENTER:
                 mCenterPosX = anchorPosX;
@@ -104,7 +131,6 @@ public class EFSprite extends EFNode implements IEFSprite {
         }
         mHeight = mBitmap.getHeight();
         mWidth = mBitmap.getWidth();
-//        mRect = new Rect(mStartPosX, mStartPosY, mStartPosX + mWidth, mStartPosY + mHeight);
     }
 
 

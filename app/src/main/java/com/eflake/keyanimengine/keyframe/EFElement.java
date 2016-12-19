@@ -26,14 +26,20 @@ public class EFElement extends EFSprite implements IEFElement {
     private float mLastPositionY;
     public IEFAnimListener mIEFAnimListener;
     public EFKeyFrame defaultPosKeyFrame;
+    public EFAnim mAnim;
     private boolean mHasDraw = false;
     private int mFakeRotation = 35;
     private boolean mIncrease = true;
     private float mFakeScale;
-    private int mFakeAlhpa = 50;
+    private int mFakeAlpha = 100;
 
     public EFElement(Context context, String path, int startPosX, int startPosY) {
         super(context, path, startPosX, startPosY);
+        initDefaultKeyFrame();
+    }
+
+    public EFElement(Context context, String path, int startPosX, int startPosY, float width, int height) {
+        super(context, path, startPosX, startPosY, width, height);
         initDefaultKeyFrame();
     }
 
@@ -42,13 +48,19 @@ public class EFElement extends EFSprite implements IEFElement {
         initDefaultKeyFrame();
     }
 
-    public EFElement(Context context, int resId, int startPosX, int startPosY) {
+
+    public EFElement(Context context, int resId, float startPosX, float startPosY) {
         super(context, resId, startPosX, startPosY);
         initDefaultKeyFrame();
     }
 
-    public EFElement(Context context, int resId, int anchorPosX, int anchorPosY, int anchorPointType) {
+    public EFElement(Context context, int resId, float anchorPosX, float anchorPosY, int anchorPointType) {
         super(context, resId, anchorPosX, anchorPosY, anchorPointType);
+        initDefaultKeyFrame();
+    }
+
+    public EFElement(Context context, int resId, float startPosX, float startPosY, float width, float height) {
+        super(context, resId, startPosX, startPosY, width, height);
         initDefaultKeyFrame();
     }
 
@@ -74,6 +86,16 @@ public class EFElement extends EFSprite implements IEFElement {
     }
 
     @Override
+    public EFAnim getAnim() {
+        return mAnim;
+    }
+
+    @Override
+    public void setAnim(EFAnim anim) {
+        mAnim = anim;
+    }
+
+    @Override
     public void addPositionKeyFrame(EFKeyFrame positionKeyFrame) {
         //TODO 插入关键帧时机,应当先将上一帧的数值给赋上
         int posKeyFrameSize = positionKeyFrameList.size();
@@ -83,13 +105,9 @@ public class EFElement extends EFSprite implements IEFElement {
             positionKeyFrame.setLastKeyFrame(defaultPosKeyFrame);
             //第一个关键帧区域内,属性以第一个关键帧属性为准
             positionKeyFrame.setInterpolator(new KeepInterpolator());
-        } else if (posKeyFrameSize == 1) {
-            positionKeyFrame.setLastKeyFrame(positionKeyFrameList.get(posKeyFrameSize - 1));
-            //默认设置线性差值器
-            positionKeyFrame.setInterpolator(new LinearInterpolator());
         } else {
             positionKeyFrame.setLastKeyFrame(positionKeyFrameList.get(posKeyFrameSize - 1));
-            //默认设置线性差值器
+            //默认设置线性差值器,后续考虑扩展
             positionKeyFrame.setInterpolator(new LinearInterpolator());
         }
         positionKeyFrameList.add(positionKeyFrame);
@@ -122,6 +140,16 @@ public class EFElement extends EFSprite implements IEFElement {
         // 处理Position关键帧
         int posFrameAreaIndex = judgePosFrameArea(animFrameIndex);
         setCurrentFramePosValue(posFrameAreaIndex, animFrameIndex);
+
+        //TODO 处理Rotation关键帧
+        //TODO 处理Scale关键帧
+        //TODO 处理Alpha关键帧
+        //TODO 处理Path关键帧
+
+        //转换相对坐标
+        convertRelativeToRealPos();
+        //转换成对应ViewPort坐标
+        convertViewPortPos();
     }
 
     private int judgePosFrameArea(long currentAnimFrameIndex) {
@@ -147,8 +175,7 @@ public class EFElement extends EFSprite implements IEFElement {
 
     private void setCurrentFramePosValue(int posFrameAreaIndex, long animFrameIndex) {
         int posKeyFrameSize = positionKeyFrameList.size();
-        if (posKeyFrameSize == 0) {
-        } else {
+        if (posKeyFrameSize != 0) {
             if (posFrameAreaIndex < posKeyFrameSize) {
                 EFKeyFrame targetKeyFrame = positionKeyFrameList.get(posFrameAreaIndex);
                 //上一个KeyFrame坐标
@@ -162,16 +189,16 @@ public class EFElement extends EFSprite implements IEFElement {
                 float currentValuePosX = Float.valueOf(currentValueArray[0]);
                 float currentValuePosY = Float.valueOf(currentValueArray[1]);
                 //两个关键帧的时间差
-                long lastTime = targetKeyFrame.lastKeyFrame.time;
-                long currentTime = targetKeyFrame.time;
-                long keyframeDuration = currentTime - lastTime;
+                long lastPosKeyFrameTime = targetKeyFrame.lastKeyFrame.time;
+                long currentPosKeyFrameTime = targetKeyFrame.time;
+                long keyframeDuration = currentPosKeyFrameTime - lastPosKeyFrameTime;
                 //两个关键帧距离差
                 float keyframeDistanceX = currentValuePosX - lastValuePosX;
                 float keyframeDistanceY = currentValuePosY - lastValuePosY;
                 //获取差值器
                 Interpolator interpolator = targetKeyFrame.interpolator;
                 //计算KeyFrame差值器当前执行时间进度百分比
-                float keyframeTimeFraction = (animFrameIndex - lastTime) / (float) keyframeDuration;
+                float keyframeTimeFraction = (animFrameIndex - lastPosKeyFrameTime) / (float) keyframeDuration;
                 //计算KeyFrame差值器计算返回后的结果进度百分比
                 float realValueFraction = interpolator.getInterpolation(keyframeTimeFraction);
                 //计算设置结果
@@ -189,10 +216,14 @@ public class EFElement extends EFSprite implements IEFElement {
                 setCenterPosX(currentValuePosX);
                 setCenterPosY(currentValuePosY);
             }
-
-
         }
+    }
 
+    private void convertViewPortPos() {
+        if (getAnim() != null) {
+            mCenterPosX = getAnim().getViewPortPosX(mCenterPosX);
+            mCenterPosY = getAnim().getViewPortPosY(mCenterPosY);
+        }
     }
 
     public void draw(Canvas canvas, Paint defaultPaint) {
@@ -208,11 +239,11 @@ public class EFElement extends EFSprite implements IEFElement {
         if (mIncrease) {
             mFakeScale += 0.05f;
             mFakeRotation += 4;
-            mFakeAlhpa += 5;
+            mFakeAlpha += 3;
         } else {
             mFakeScale -= 0.05f;
             mFakeRotation -= 4;
-            mFakeAlhpa -= 5;
+            mFakeAlpha -= 3;
         }
         if (mFakeScale >= 2.0f) {
             mIncrease = false;
@@ -222,6 +253,10 @@ public class EFElement extends EFSprite implements IEFElement {
         }
         mMatrix.preScale(mFakeScale, mFakeScale, mBitmap.getWidth() / 2, mBitmap.getHeight() / 2);
         mMatrix.preRotate(mFakeRotation, mBitmap.getWidth() / 2, mBitmap.getHeight() / 2);
+        defaultPaint.setAlpha(mFakeAlpha);
+        canvas.drawBitmap(mBitmap, mMatrix, defaultPaint);
+        canvas.restore();
+
 //        mMatrix.preRotate(1.0f,mBitmap.getWidth()/2,mBitmap.getHeight()/2);
 //        mMatrix.preScale(0.5f,0.5f,mBitmap.getWidth()/2,mBitmap.getHeight()/2);
 //        canvas.save();
@@ -229,10 +264,6 @@ public class EFElement extends EFSprite implements IEFElement {
 //        mMatrix.postTranslate(1.0f,1.0f);
 //        mMatrix.preTranslate(1.0f,1.0f);
 //        mMatrix.postRotate(500,500.0f,500.0f);
-        canvas.save();
-        defaultPaint.setAlpha(mFakeAlhpa);
-        canvas.drawBitmap(mBitmap, mMatrix, defaultPaint);
-        canvas.restore();
     }
 
 

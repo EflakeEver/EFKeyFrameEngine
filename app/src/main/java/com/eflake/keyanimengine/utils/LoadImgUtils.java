@@ -49,12 +49,12 @@ public class LoadImgUtils {
         return BitmapFactory.decodeResource(context.getResources(), resId, opt);
     }
 
-    public static Bitmap ReadResourceBitMapWithScale(Context context, int resId, int targetWidth, int targetHeight) {
+    public static Bitmap ReadResourceBitMapWithScale(Context context, int resId, float targetWidth, float targetHeight) {
         BitmapFactory.Options opt = new BitmapFactory.Options();
         opt.inJustDecodeBounds = true;
         BitmapFactory.decodeResource(context.getResources(), resId, opt);
         opt.inJustDecodeBounds = false;
-        opt.inSampleSize = calSampleSize(opt, targetWidth, targetHeight);
+        opt.inSampleSize = calSampleSize(opt, (int) targetWidth, (int) targetHeight);
         return BitmapFactory.decodeResource(context.getResources(), resId, opt);
     }
 
@@ -68,11 +68,11 @@ public class LoadImgUtils {
         return BitmapFactory.decodeFile(imgPath, opt);
     }
 
-    public static Bitmap ReadFileBitMap(Context context, String imgPath, int targetWidth, int targetHeight) {
+    public static Bitmap ReadFileBitMap(Context context, String imgPath, float targetWidth, float targetHeight) {
         BitmapFactory.Options opt = new BitmapFactory.Options();
         opt.inPreferredConfig = Config.RGB_565;
         opt.inSampleSize = 1;
-        opt.inSampleSize = calSampleSize(opt, targetWidth, targetHeight);
+        opt.inSampleSize = calSampleSize(opt, (int) targetWidth, (int) targetHeight);
         return BitmapFactory.decodeFile(imgPath, opt);
     }
 
