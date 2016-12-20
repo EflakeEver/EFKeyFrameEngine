@@ -10,6 +10,7 @@ import com.eflake.keyanimengine.keyframe.EFAnim;
 import com.eflake.keyanimengine.keyframe.EFAnimManager;
 import com.eflake.keyanimengine.keyframe.EFElement;
 import com.eflake.keyanimengine.keyframe.EFKeyFrame;
+import com.eflake.keyanimengine.keyframe.EFViewPort;
 import com.eflake.keyanimengine.main.R;
 import com.eflake.keyanimengine.sprite.EFSprite;
 import com.eflake.keyanimengine.utils.LoadImgUtils;
@@ -91,20 +92,21 @@ public class TransparentSurfaceView extends EFSurfaceView {
         //TODO 加载动画描述文件之前,需要确保动画资源文件已经下载完毕
 
         EFAnim anim = new EFAnim();
+        anim.setViewPort(new EFViewPort(1080.0f, 1920.0f));
         EFElement element_parent = new EFElement(mContext, R.mipmap.mitao, 0, 0);
         element_parent.addPositionKeyFrame(new EFKeyFrame(0, 1, "200.0,-400.0"));
         element_parent.addPositionKeyFrame(new EFKeyFrame(1, 48, "200.0,400.0"));
-        element_parent.addPositionKeyFrame(new EFKeyFrame(2, 88, "1200.0,400.0"));
-        element_parent.addPositionKeyFrame(new EFKeyFrame(3, 128, "1200.0,-400.0"));
+//        element_parent.addPositionKeyFrame(new EFKeyFrame(2, 88, "600.0,400.0"));
+//        element_parent.addPositionKeyFrame(new EFKeyFrame(3, 128, "600.0,-400.0"));
 //        element_first.addRotationKeyFrame(new EFKeyFrame(0, 120, "30"));
 //        element_first.addRotationKeyFrame(new EFKeyFrame(1, 240, "90"));
         anim.addElement(KEY_PARENT_ELEMENT, element_parent);
 
-        EFElement element_child = new EFElement(mContext, R.mipmap.cucumber, 0, 0);
-        element_child.addPositionKeyFrame(new EFKeyFrame(0, 1, "0.0,0.0"));
+//        EFElement element_child = new EFElement(mContext, R.mipmap.cucumber, 0, 0);
+//        element_child.addPositionKeyFrame(new EFKeyFrame(0, 1, "0.0,0.0"));
 //        element_child.addPositionKeyFrame(new EFKeyFrame(1, 88, "100.0,0.0"));
-        element_child.setParentNode(element_parent);
-        anim.addElement(KEY_CHILD_ELEMENT, element_child);
+//        element_child.setParentNode(element_parent);
+//        anim.addElement(KEY_CHILD_ELEMENT, element_child);
 
         EFAnimManager.getInstance().addAnim(KEY_SINGLE_ANIM, anim);
 

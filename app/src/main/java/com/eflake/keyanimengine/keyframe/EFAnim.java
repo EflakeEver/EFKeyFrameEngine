@@ -33,6 +33,7 @@ public class EFAnim implements IEFAnim {
             return;
         }
         mElements.put(key, element);
+        element.setAnim(this);
     }
 
 
@@ -48,7 +49,7 @@ public class EFAnim implements IEFAnim {
 
     @Override
     public void setViewPort(EFViewPort viewPort) {
-
+        mViewport = viewPort;
     }
 
     @Override

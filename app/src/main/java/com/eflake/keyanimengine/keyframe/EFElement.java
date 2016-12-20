@@ -221,8 +221,8 @@ public class EFElement extends EFSprite implements IEFElement {
 
     private void convertViewPortPos() {
         if (getAnim() != null) {
-            mCenterPosX = getAnim().getViewPortPosX(mCenterPosX);
-            mCenterPosY = getAnim().getViewPortPosY(mCenterPosY);
+            setCenterPosX(getAnim().getViewPortPosX(mCenterPosX));
+            setCenterPosY(getAnim().getViewPortPosY(mCenterPosY));
         }
     }
 
