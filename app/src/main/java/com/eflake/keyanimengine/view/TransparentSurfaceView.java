@@ -9,7 +9,7 @@ import android.view.SurfaceHolder;
 import com.eflake.keyanimengine.keyframe.EFAnim;
 import com.eflake.keyanimengine.keyframe.EFAnimManager;
 import com.eflake.keyanimengine.keyframe.EFElement;
-import com.eflake.keyanimengine.keyframe.EFKeyFrame;
+import com.eflake.keyanimengine.keyframe.EFPathKeyFrame;
 import com.eflake.keyanimengine.keyframe.EFViewPort;
 import com.eflake.keyanimengine.main.R;
 import com.eflake.keyanimengine.sprite.EFSprite;
@@ -90,24 +90,33 @@ public class TransparentSurfaceView extends EFSurfaceView {
         EFAnimManager.getInstance().addAnim(KEY_SINGLE_ANIM, anim);*/
 
         //TODO 加载动画描述文件之前,需要确保动画资源文件已经下载完毕
-
-        EFAnim anim = new EFAnim();
-        anim.setViewPort(new EFViewPort(1080.0f, 1920.0f));
-        EFElement element_parent = new EFElement(mContext, R.mipmap.mitao, 0, 0);
-        element_parent.addPositionKeyFrame(new EFKeyFrame(0, 1, "200.0,-400.0"));
-        element_parent.addPositionKeyFrame(new EFKeyFrame(1, 48, "200.0,400.0"));
-//        element_parent.addPositionKeyFrame(new EFKeyFrame(2, 88, "600.0,400.0"));
-//        element_parent.addPositionKeyFrame(new EFKeyFrame(3, 128, "600.0,-400.0"));
-//        element_first.addRotationKeyFrame(new EFKeyFrame(0, 120, "30"));
-//        element_first.addRotationKeyFrame(new EFKeyFrame(1, 240, "90"));
-        anim.addElement(KEY_PARENT_ELEMENT, element_parent);
-
+//        EFAnim anim = new EFAnim();
+//        anim.setDuration(170);
+//        anim.setViewPort(new EFViewPort(1080.0f, 1920.0f));
+//        EFElement element_parent = new EFElement(mContext, R.mipmap.mitao, 0, 0);
+//        element_parent.addPositionKeyFrame(new EFPosKeyFrame(1, "200.0,-400.0"));
+//        element_parent.addPositionKeyFrame(new EFPosKeyFrame(48, "200.0,400.0"));
+//        element_parent.addPositionKeyFrame(new EFPosKeyFrame(88, "600.0,400.0"));
+//        element_parent.addPositionKeyFrame(new EFPosKeyFrame(128, "600.0,-400.0"));
+//        anim.addElement(KEY_PARENT_ELEMENT, element_parent);
+//
 //        EFElement element_child = new EFElement(mContext, R.mipmap.cucumber, 0, 0);
-//        element_child.addPositionKeyFrame(new EFKeyFrame(0, 1, "0.0,0.0"));
-//        element_child.addPositionKeyFrame(new EFKeyFrame(1, 88, "100.0,0.0"));
+//        element_child.addPositionKeyFrame(new EFPosKeyFrame(1, "0.0,0.0"));
+//        element_child.addPositionKeyFrame(new EFPosKeyFrame(88, "100.0,0.0"));
 //        element_child.setParentNode(element_parent);
 //        anim.addElement(KEY_CHILD_ELEMENT, element_child);
 
+        //TODO 曲线路径移动
+        EFAnim anim = new EFAnim();
+        anim.setViewPort(new EFViewPort(1080.0f, 1920.0f));
+        EFElement element_parent = new EFElement(mContext, R.mipmap.mitao, 0, 0);
+        element_parent.addPathKeyFrame(new EFPathKeyFrame(1, "200.0,700.0", "0.0,0.0"));
+        element_parent.addPathKeyFrame(new EFPathKeyFrame(30, "500.0,700.0", "550.0,300.0"));
+        element_parent.addPathKeyFrame(new EFPathKeyFrame(60, "700.0,700.0", "750.0,300.0"));
+        element_parent.addPathKeyFrame(new EFPathKeyFrame(90, "1000.0,700.0", "950.0,300.0"));
+        anim.addElement(KEY_PARENT_ELEMENT, element_parent);
+
+        //添加并执行动画
         EFAnimManager.getInstance().addAnim(KEY_SINGLE_ANIM, anim);
 
 //        postDelayed(new Runnable() {

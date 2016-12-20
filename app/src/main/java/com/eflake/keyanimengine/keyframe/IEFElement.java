@@ -6,7 +6,7 @@ public interface IEFElement {
 
     String getName();
 
-    void addPositionKeyFrame(EFKeyFrame positionKeyFrame);
+    void addPositionKeyFrame(EFPosKeyFrame positionKeyFrame);
 
     void addRotationKeyFrame(EFKeyFrame rotationKeyFrame);
 
@@ -14,7 +14,7 @@ public interface IEFElement {
 
     void addScaleKeyFrame(EFKeyFrame scaleKeyFrame);
 
-    void addPathKeyFrame(EFKeyFrame pathKeyFrame);
+    void addPathKeyFrame(EFPathKeyFrame pathKeyFrame);
 
     void updateAnim(long allAnimFrameIndex);
 
