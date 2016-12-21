@@ -8,11 +8,11 @@ public interface IEFElement {
 
     void addPositionKeyFrame(EFPosKeyFrame positionKeyFrame);
 
-    void addRotationKeyFrame(EFKeyFrame rotationKeyFrame);
+    void addRotationKeyFrame(EFRotationKeyFrame rotationKeyFrame);
 
-    void addAlphaKeyFrame(EFKeyFrame alphaKeyFrame);
+    void addAlphaKeyFrame(EFAlphaKeyFrame alphaKeyFrame);
 
-    void addScaleKeyFrame(EFKeyFrame scaleKeyFrame);
+    void addScaleKeyFrame(EFScaleKeyFrame scaleKeyFrame);
 
     void addPathKeyFrame(EFPathKeyFrame pathKeyFrame);
 

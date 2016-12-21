@@ -5,7 +5,7 @@ import android.view.animation.Interpolator;
 
 import com.eflake.keyanimengine.evaluator.IEFFloatEvaluator;
 
-public interface IEFPosKeyFrame extends IEFKeyFrame{
+public interface IEFFloatKeyFrame extends IEFKeyFrame{
 
     void setInterpolator(Interpolator interpolator);
 

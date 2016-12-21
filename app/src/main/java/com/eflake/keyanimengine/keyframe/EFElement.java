@@ -4,7 +4,6 @@ package com.eflake.keyanimengine.keyframe;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Paint;
-import android.util.Log;
 import android.view.animation.Interpolator;
 import android.view.animation.LinearInterpolator;
 
@@ -28,20 +27,17 @@ public class EFElement extends EFSprite implements IEFElement {
 
     public String mName;//元素名称
     public List<EFPosKeyFrame> positionKeyFrameList = new ArrayList<>();//位置关键帧集合
-    public List<EFKeyFrame> rotationKeyFrameList = new ArrayList<>();//旋转关键帧集合
-    public List<EFKeyFrame> alphaKeyFrameList = new ArrayList<>();//透明度关键帧集合
-    public List<EFKeyFrame> scaleKeyFrameList = new ArrayList<>();//缩放关键帧集合
+    public List<EFRotationKeyFrame> rotationKeyFrameList = new ArrayList<>();//旋转关键帧集合
+    public List<EFAlphaKeyFrame> alphaKeyFrameList = new ArrayList<>();//透明度关键帧集合
+    public List<EFScaleKeyFrame> scaleKeyFrameList = new ArrayList<>();//缩放关键帧集合
     public List<EFPathKeyFrame> pathKeyFrameList = new ArrayList<>();//路径关键帧集合
-    private float mLastPositionX;
-    private float mLastPositionY;
     public IEFAnimListener mIEFAnimListener;
-    public EFKeyFrame defaultPosKeyFrame;
+    public EFPosKeyFrame defaultPosKeyFrame;
+    public EFScaleKeyFrame defaultScaleKeyFrame;
+    public EFPathKeyFrame defaultPathKeyFrame;
+    public EFRotationKeyFrame defaultRotationKeyFrame;
+    public EFAlphaKeyFrame defaultAlphaKeyFrame;
     public EFAnim mAnim;
-    private boolean mHasDraw = false;
-    private int mFakeRotation = 35;
-    private boolean mIncrease = true;
-    private float mFakeScale;
-    private int mFakeAlpha = 100;
 
 
     public EFElement(Context context, String path, int startPosX, int startPosY) {
@@ -76,8 +72,12 @@ public class EFElement extends EFSprite implements IEFElement {
     }
 
     private void initDefaultKeyFrame() {
-        //此处的defaultKeyFrame并不放入List,仅作为初始赋值用
-        defaultPosKeyFrame = new EFKeyFrame(0, "0,0");
+        //此处的defaultKeyFrame并不放入各个属性List,仅作为初始赋值用
+        defaultPosKeyFrame = new EFPosKeyFrame(0, "0,0");
+        defaultAlphaKeyFrame = new EFAlphaKeyFrame(0, "255");
+        defaultRotationKeyFrame = new EFRotationKeyFrame(0, "0");
+        defaultScaleKeyFrame = new EFScaleKeyFrame(0, "1.0,1.0");
+        defaultPathKeyFrame = new EFPathKeyFrame(0, "0.0,0.0", "0.0,0.0");
     }
 
     @Override
@@ -107,7 +107,6 @@ public class EFElement extends EFSprite implements IEFElement {
 
     @Override
     public void addPositionKeyFrame(EFPosKeyFrame positionKeyFrame) {
-        //TODO 插入关键帧时机,应当先将上一帧的数值给赋上
         int posKeyFrameSize = positionKeyFrameList.size();
         //根据当前Size不同,插入的关键帧对应设置也需要分场景
         if (posKeyFrameSize == 0) {
@@ -128,17 +127,65 @@ public class EFElement extends EFSprite implements IEFElement {
     }
 
     @Override
-    public void addRotationKeyFrame(EFKeyFrame rotationKeyFrame) {
+    public void addRotationKeyFrame(EFRotationKeyFrame rotationKeyFrame) {
+        int rotationKeyFrameSize = rotationKeyFrameList.size();
+        //根据当前Size不同,插入的关键帧对应设置也需要分场景
+        if (rotationKeyFrameSize == 0) {
+            //添加的是第一个关键帧
+            rotationKeyFrame.setLastKeyFrame(defaultRotationKeyFrame);
+            //第一个关键帧区域内,属性以第一个关键帧属性为准
+            //TODO new 对象
+            rotationKeyFrame.setEvaluator(new EFKeepEvaluator());
+        } else {
+            rotationKeyFrame.setLastKeyFrame(rotationKeyFrameList.get(rotationKeyFrameSize - 1));
+            //默认设置线性差值器,后续考虑扩展
+            //TODO new 对象
+            rotationKeyFrame.setEvaluator(new EFLinearEvaluator());
+        }
+        //TODO new 对象
+        rotationKeyFrame.setInterpolator(new LinearInterpolator());
         rotationKeyFrameList.add(rotationKeyFrame);
     }
 
     @Override
-    public void addAlphaKeyFrame(EFKeyFrame alphaKeyFrame) {
+    public void addAlphaKeyFrame(EFAlphaKeyFrame alphaKeyFrame) {
+        int alphaKeyFrameSize = alphaKeyFrameList.size();
+        //根据当前Size不同,插入的关键帧对应设置也需要分场景
+        if (alphaKeyFrameSize == 0) {
+            //添加的是第一个关键帧
+            alphaKeyFrame.setLastKeyFrame(defaultAlphaKeyFrame);
+            //第一个关键帧区域内,属性以第一个关键帧属性为准
+            //TODO new 对象
+            alphaKeyFrame.setEvaluator(new EFKeepEvaluator());
+        } else {
+            alphaKeyFrame.setLastKeyFrame(alphaKeyFrameList.get(alphaKeyFrameSize - 1));
+            //默认设置线性差值器,后续考虑扩展
+            //TODO new 对象
+            alphaKeyFrame.setEvaluator(new EFLinearEvaluator());
+        }
+        //TODO new 对象
+        alphaKeyFrame.setInterpolator(new LinearInterpolator());
         alphaKeyFrameList.add(alphaKeyFrame);
     }
 
     @Override
-    public void addScaleKeyFrame(EFKeyFrame scaleKeyFrame) {
+    public void addScaleKeyFrame(EFScaleKeyFrame scaleKeyFrame) {
+        int scaleKeyFrameSize = scaleKeyFrameList.size();
+        //根据当前Size不同,插入的关键帧对应设置也需要分场景
+        if (scaleKeyFrameSize == 0) {
+            //添加的是第一个关键帧
+            scaleKeyFrame.setLastKeyFrame(defaultScaleKeyFrame);
+            //第一个关键帧区域内,属性以第一个关键帧属性为准
+            //TODO new 对象
+            scaleKeyFrame.setEvaluator(new EFKeepEvaluator());
+        } else {
+            scaleKeyFrame.setLastKeyFrame(scaleKeyFrameList.get(scaleKeyFrameSize - 1));
+            //默认设置线性差值器,后续考虑扩展
+            //TODO new 对象
+            scaleKeyFrame.setEvaluator(new EFLinearEvaluator());
+        }
+        //TODO new 对象
+        scaleKeyFrame.setInterpolator(new LinearInterpolator());
         scaleKeyFrameList.add(scaleKeyFrame);
     }
 
@@ -146,7 +193,7 @@ public class EFElement extends EFSprite implements IEFElement {
     public void addPathKeyFrame(EFPathKeyFrame pathKeyFrame) {
         int pathKeyFrameSize = pathKeyFrameList.size();
         if (pathKeyFrameSize == 0) {
-            pathKeyFrame.setLastKeyFrame(defaultPosKeyFrame);
+            pathKeyFrame.setLastKeyFrame(defaultPathKeyFrame);
             pathKeyFrame.setEvaluator(new EFBezierKeepEvaluator());
         } else {
             pathKeyFrame.setLastKeyFrame(pathKeyFrameList.get(pathKeyFrameSize - 1));
@@ -158,24 +205,36 @@ public class EFElement extends EFSprite implements IEFElement {
 
     @Override
     public void updateAnim(long animFrameIndex) {
-        //TODO 此处根据动画当前执行的帧数,计算并设置对应属性值
-        Log.e("eflake", "updateAnim ,index = " + animFrameIndex);
+
         // 处理Position关键帧
         if (positionKeyFrameList.size() > 0) {
-//            int posFrameAreaIndex = judgePosFrameArea(animFrameIndex);
             int posFrameAreaIndex = judgeFrameArea(TYPE_POS, animFrameIndex);
-            setCurrentFramePosValue(TYPE_POS, posFrameAreaIndex, animFrameIndex);
+            setCurrentKeyFrameValue(TYPE_POS, posFrameAreaIndex, animFrameIndex);
         }
 
         // 处理Path关键帧
         if (pathKeyFrameList.size() > 0) {
             int pathFrameAreaIndex = judgeFrameArea(TYPE_PATH, animFrameIndex);
-            setCurrentFramePosValue(TYPE_PATH, pathFrameAreaIndex, animFrameIndex);
+            setCurrentKeyFrameValue(TYPE_PATH, pathFrameAreaIndex, animFrameIndex);
         }
 
-        //TODO 处理Rotation关键帧
-        //TODO 处理Scale关键帧
-        //TODO 处理Alpha关键帧
+        // 处理Rotation关键帧
+        if (rotationKeyFrameList.size() > 0) {
+            int rotationFrameAreaIndex = judgeFrameArea(TYPE_ROTATION, animFrameIndex);
+            setCurrentKeyFrameValue(TYPE_ROTATION, rotationFrameAreaIndex, animFrameIndex);
+        }
+
+        // 处理Scale关键帧
+        if (scaleKeyFrameList.size() > 0) {
+            int scaleFrameAreaIndex = judgeFrameArea(TYPE_SCALE, animFrameIndex);
+            setCurrentKeyFrameValue(TYPE_SCALE, scaleFrameAreaIndex, animFrameIndex);
+        }
+
+        // 处理Alpha关键帧
+        if (alphaKeyFrameList.size() > 0) {
+            int pathFrameAreaIndex = judgeFrameArea(TYPE_ALPHA, animFrameIndex);
+            setCurrentKeyFrameValue(TYPE_ALPHA, pathFrameAreaIndex, animFrameIndex);
+        }
 
         //转换相对坐标为绝对坐标
         convertRelativeToRealPos();
@@ -188,23 +247,8 @@ public class EFElement extends EFSprite implements IEFElement {
     private void applyMatrix() {
         mMatrix = getMatrix();
         mMatrix.setTranslate(mStartPosX, mStartPosY);
-        if (mIncrease) {
-            mFakeScale += 0.05f;
-            mFakeRotation += 4;
-            mFakeAlpha += 3;
-        } else {
-            mFakeScale -= 0.05f;
-            mFakeRotation -= 4;
-            mFakeAlpha -= 3;
-        }
-        if (mFakeScale >= 2.0f) {
-            mIncrease = false;
-        }
-        if (mFakeScale <= 0.5) {
-            mIncrease = true;
-        }
-        mMatrix.preScale(mFakeScale, mFakeScale, mBitmap.getWidth() / 2, mBitmap.getHeight() / 2);
-        mMatrix.preRotate(mFakeRotation, mBitmap.getWidth() / 2, mBitmap.getHeight() / 2);
+        mMatrix.preScale(mScaleX, mScaleY, mBitmap.getWidth() / 2, mBitmap.getHeight() / 2);
+        mMatrix.preRotate(mRotation, mBitmap.getWidth() / 2, mBitmap.getHeight() / 2);
     }
 
     private int judgeFrameArea(int type, long currentAnimFrameIndex) {
@@ -250,7 +294,7 @@ public class EFElement extends EFSprite implements IEFElement {
         return result;
     }
 
-    private void setCurrentFramePosValue(int type, int keyFrameAreaIndex, long animFrameIndex) {
+    private void setCurrentKeyFrameValue(int type, int keyFrameAreaIndex, long animFrameIndex) {
         int keyFrameSize = 0;
         List list = null;
         switch (type) {
@@ -276,7 +320,9 @@ public class EFElement extends EFSprite implements IEFElement {
         if (keyFrameSize != 0) {
             //有关键帧，计算
             if (keyFrameAreaIndex < keyFrameSize) {
+                //所有关键帧区间内
                 if (type == TYPE_POS || type == TYPE_PATH) {
+                    //Position & Path
                     EFKeyFrame targetKeyFrame = (EFKeyFrame) list.get(keyFrameAreaIndex);
                     //上一个KeyFrame坐标
                     String lastValue = targetKeyFrame.lastKeyFrame.value;
@@ -322,10 +368,61 @@ public class EFElement extends EFSprite implements IEFElement {
                         setCenterPosX(realValueX);
                         setCenterPosY(realValueY);
                     }
-
+                } else if (type == TYPE_ROTATION || type == TYPE_ALPHA) {
+                    //Rotation & Alpha
+                    EFKeyFrame targetKeyFrame = (EFKeyFrame) list.get(keyFrameAreaIndex);
+                    //上一个KeyFrame坐标
+                    float lastValue = Float.valueOf(targetKeyFrame.lastKeyFrame.value);
+                    //当前KeyFrame点坐标
+                    float currentValue = Float.valueOf(targetKeyFrame.value);
+                    //两个关键帧的时间差
+                    long lastPosKeyFrameTime = targetKeyFrame.lastKeyFrame.time;
+                    long currentPosKeyFrameTime = targetKeyFrame.time;
+                    long keyframeDuration = currentPosKeyFrameTime - lastPosKeyFrameTime;
+                    Interpolator interpolator = ((EFFloatKeyFrame) targetKeyFrame).interpolator;
+                    //计算KeyFrame差值器input,即当前区间的动画执行时间进度百分比
+                    float keyframeTimeFraction = (animFrameIndex - lastPosKeyFrameTime) / (float) keyframeDuration;
+                    //计算KeyFrame差值器，计算返回后的结果进度百分比
+                    float realTimeFraction = interpolator.getInterpolation(keyframeTimeFraction);
+                    //计算设置结果
+                    float realValueX = ((EFFloatKeyFrame) targetKeyFrame).evaluator.evaluate(realTimeFraction, lastValue, currentValue);
+                    if (type == TYPE_ROTATION) {
+                        setRotation(realValueX);
+                    } else {
+                        setAlpha(realValueX);
+                    }
+                } else {
+                    //Scale
+                    EFKeyFrame targetKeyFrame = (EFKeyFrame) list.get(keyFrameAreaIndex);
+                    //上一个KeyFrame坐标
+                    String lastValue = targetKeyFrame.lastKeyFrame.value;
+                    String[] controlValueArray = lastValue.split(",");
+                    float lastValueScaleX = Float.valueOf(controlValueArray[0]);
+                    float lastValueScaleY = Float.valueOf(controlValueArray[1]);
+                    //当前KeyFrame点坐标
+                    String currentValue = targetKeyFrame.value;
+                    String[] currentValueArray = currentValue.split(",");
+                    float currentValueScaleX = Float.valueOf(currentValueArray[0]);
+                    float currentValueScaleY = Float.valueOf(currentValueArray[1]);
+                    //两个关键帧的时间差
+                    long lastPosKeyFrameTime = targetKeyFrame.lastKeyFrame.time;
+                    long currentPosKeyFrameTime = targetKeyFrame.time;
+                    long keyframeDuration = currentPosKeyFrameTime - lastPosKeyFrameTime;
+                    Interpolator interpolator = ((EFFloatKeyFrame) targetKeyFrame).interpolator;
+                    //计算KeyFrame差值器input,即当前区间的动画执行时间进度百分比
+                    float keyframeTimeFraction = (animFrameIndex - lastPosKeyFrameTime) / (float) keyframeDuration;
+                    //计算KeyFrame差值器，计算返回后的结果进度百分比
+                    float realTimeFraction = interpolator.getInterpolation(keyframeTimeFraction);
+                    //计算设置结果
+                    float realValueX = ((EFFloatKeyFrame) targetKeyFrame).evaluator.evaluate(realTimeFraction, lastValueScaleX, currentValueScaleX);
+                    float realValueY = ((EFFloatKeyFrame) targetKeyFrame).evaluator.evaluate(realTimeFraction, lastValueScaleY, currentValueScaleY);
+                    setScaleX(realValueX);
+                    setScaleY(realValueY);
                 }
             } else {
+                //超过最后一个区间，保持最后关键帧属性值
                 if (type == TYPE_POS || type == TYPE_PATH) {
+                    //Position & Path
                     EFKeyFrame targetKeyFrame = (EFKeyFrame) list.get(keyFrameSize - 1);
                     //当前KeyFrame点坐标
                     String currentValue = targetKeyFrame.value;
@@ -334,11 +431,30 @@ public class EFElement extends EFSprite implements IEFElement {
                     float currentValuePosY = Float.valueOf(currentValueArray[1]);
                     setCenterPosX(currentValuePosX);
                     setCenterPosY(currentValuePosY);
+                } else if (type == TYPE_ROTATION || type == TYPE_ALPHA) {
+                    //Rotation & Alpha
+                    EFKeyFrame targetKeyFrame = (EFKeyFrame) list.get(keyFrameSize - 1);
+                    float currentValue = Float.valueOf(targetKeyFrame.value);
+                    if (type == TYPE_ROTATION) {
+                        setRotation(currentValue);
+                    } else {
+                        setAlpha(currentValue);
+                    }
+                } else {
+                    //Scale
+                    EFKeyFrame targetKeyFrame = (EFKeyFrame) list.get(keyFrameSize - 1);
+                    String currentValue = targetKeyFrame.value;
+                    String[] currentValueArray = currentValue.split(",");
+                    float currentValueScaleX = Float.valueOf(currentValueArray[0]);
+                    float currentValueScaleY = Float.valueOf(currentValueArray[1]);
+                    setScaleX(currentValueScaleX);
+                    setScaleY(currentValueScaleY);
                 }
             }
         } else {
             //没有关键帧，不计算
         }
+
     }
 
     private void convertViewPortPos() {
@@ -349,7 +465,7 @@ public class EFElement extends EFSprite implements IEFElement {
     }
 
     public void draw(Canvas canvas, Paint defaultPaint) {
-        defaultPaint.setAlpha(mFakeAlpha);
+        defaultPaint.setAlpha((int) mAlpha);
         canvas.drawBitmap(mBitmap, mMatrix, defaultPaint);
     }
 

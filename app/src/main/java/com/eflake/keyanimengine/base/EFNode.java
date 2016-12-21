@@ -18,9 +18,10 @@ public class EFNode implements IEFNode {
     public float mStartPosY;//Y轴左上角坐标
     public int mWidth;//宽度
     public int mHeight;//高度
-    public int mRotation;//旋转角度
-    public float mAlpha;//不透明度
-    public float mScale;//缩放比例
+    public float mRotation;//旋转角度
+    public float mAlpha = 0;//不透明度
+    public float mScaleX = 1.0f;//缩放比例
+    public float mScaleY = 1.0f;//缩放比例
     public boolean mShowing;//是否显示
 
     @Override
@@ -119,13 +120,21 @@ public class EFNode implements IEFNode {
         convertRelativeToRealPosY();
     }
 
-    protected void setRotation(int rotation) {
+    protected void setRotation(float rotation) {
         mRotation = rotation;
     }
 
-    protected void setAlpha(int alpha) {
+    protected void setAlpha(float alpha) {
         //TODO 这里的参数alpha,传入时一般是百分比数字(不含百分号),如果是设置给Paint,只能是[0,255]区间,需要考虑转化
         mAlpha = alpha;
+    }
+
+    public void setScaleX(float scaleX) {
+        mScaleX = scaleX;
+    }
+
+    public void setScaleY(float scaleY) {
+        mScaleY = scaleY;
     }
 
     public EFNode getParentNode() {
