@@ -11,6 +11,7 @@ import com.eflake.keyanimengine.keyframe.EFAnim;
 import com.eflake.keyanimengine.keyframe.EFAnimManager;
 import com.eflake.keyanimengine.keyframe.EFElement;
 import com.eflake.keyanimengine.keyframe.EFPathKeyFrame;
+import com.eflake.keyanimengine.keyframe.EFPosKeyFrame;
 import com.eflake.keyanimengine.keyframe.EFRotationKeyFrame;
 import com.eflake.keyanimengine.keyframe.EFScaleKeyFrame;
 import com.eflake.keyanimengine.keyframe.EFViewPort;
@@ -114,7 +115,7 @@ public class TransparentSurfaceView extends EFSurfaceView {
         anim.setDuration(100);
         anim.setViewPort(new EFViewPort(1080.0f, 1920.0f));
         EFElement element_parent = new EFElement(mContext, R.mipmap.mitao, 0, 0);
-//        element_parent.addPositionKeyFrame(new EFPosKeyFrame(1, "200.0,700.0"));
+        element_parent.addPositionKeyFrame(new EFPosKeyFrame(1, "200.0,700.0"));
 //        element_parent.addPositionKeyFrame(new EFPosKeyFrame(30, "500.0,700.0"));
 //        element_parent.addPositionKeyFrame(new EFPosKeyFrame(60, "700.0,700.0"));
 //        element_parent.addPositionKeyFrame(new EFPosKeyFrame(90, "1000.0,700.0"));
@@ -128,9 +129,9 @@ public class TransparentSurfaceView extends EFSurfaceView {
         element_parent.addAlphaKeyFrame(new EFAlphaKeyFrame(30, "100.0"));
         element_parent.addAlphaKeyFrame(new EFAlphaKeyFrame(60, "50.0"));
         element_parent.addAlphaKeyFrame(new EFAlphaKeyFrame(90, "100.0"));
-        element_parent.addScaleKeyFrame(new EFScaleKeyFrame(30, "1.0,1.0"));
-        element_parent.addScaleKeyFrame(new EFScaleKeyFrame(60, "0.5,0.5"));
-        element_parent.addScaleKeyFrame(new EFScaleKeyFrame(90, "2.0,2.0"));
+        element_parent.addScaleKeyFrame(new EFScaleKeyFrame(30, "100.0,100.0"));
+        element_parent.addScaleKeyFrame(new EFScaleKeyFrame(60, "50.0,50.0"));
+        element_parent.addScaleKeyFrame(new EFScaleKeyFrame(90, "200.0,200.0"));
         anim.addElement(KEY_PARENT_ELEMENT, element_parent);
 
         //添加并执行动画

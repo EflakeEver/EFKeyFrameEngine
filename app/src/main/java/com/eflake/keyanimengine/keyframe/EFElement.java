@@ -12,7 +12,7 @@ import com.eflake.keyanimengine.evaluator.EFBezierKeepEvaluator;
 import com.eflake.keyanimengine.evaluator.EFKeepEvaluator;
 import com.eflake.keyanimengine.evaluator.EFLinearEvaluator;
 import com.eflake.keyanimengine.sprite.EFSprite;
-import com.eflake.keyanimengine.utils.AlphaUtils;
+import com.eflake.keyanimengine.utils.PropertyConvertUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -391,7 +391,7 @@ public class EFElement extends EFSprite implements IEFElement {
                         setRotation(realValueX);
                     } else {
                         //因为paint.setAlpha的参数取值为[0,255]，这里需要转换一下
-                        setAlpha(AlphaUtils.convert(realValueX));
+                        setAlpha(PropertyConvertUtils.convertAlpha(realValueX));
                     }
                 } else {
                     //Scale
@@ -418,8 +418,8 @@ public class EFElement extends EFSprite implements IEFElement {
                     //计算设置结果
                     float realValueX = ((EFFloatKeyFrame) targetKeyFrame).evaluator.evaluate(realTimeFraction, lastValueScaleX, currentValueScaleX);
                     float realValueY = ((EFFloatKeyFrame) targetKeyFrame).evaluator.evaluate(realTimeFraction, lastValueScaleY, currentValueScaleY);
-                    setScaleX(realValueX);
-                    setScaleY(realValueY);
+                    setScaleX(PropertyConvertUtils.convertScale(realValueX));
+                    setScaleY(PropertyConvertUtils.convertScale(realValueY));
                 }
             } else {
                 //超过最后一个区间，保持最后关键帧属性值
@@ -440,7 +440,7 @@ public class EFElement extends EFSprite implements IEFElement {
                     if (type == TYPE_ROTATION) {
                         setRotation(currentValue);
                     } else {
-                        setAlpha(AlphaUtils.convert(currentValue));
+                        setAlpha(PropertyConvertUtils.convertAlpha(currentValue));
                     }
                 } else {
                     //Scale
@@ -449,8 +449,8 @@ public class EFElement extends EFSprite implements IEFElement {
                     String[] currentValueArray = currentValue.split(",");
                     float currentValueScaleX = Float.valueOf(currentValueArray[0]);
                     float currentValueScaleY = Float.valueOf(currentValueArray[1]);
-                    setScaleX(currentValueScaleX);
-                    setScaleY(currentValueScaleY);
+                    setScaleX(PropertyConvertUtils.convertScale(currentValueScaleX));
+                    setScaleY(PropertyConvertUtils.convertScale(currentValueScaleY));
                 }
             }
         } else {
