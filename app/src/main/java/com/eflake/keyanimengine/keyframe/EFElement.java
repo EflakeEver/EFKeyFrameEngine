@@ -12,6 +12,7 @@ import com.eflake.keyanimengine.evaluator.EFBezierKeepEvaluator;
 import com.eflake.keyanimengine.evaluator.EFKeepEvaluator;
 import com.eflake.keyanimengine.evaluator.EFLinearEvaluator;
 import com.eflake.keyanimengine.sprite.EFSprite;
+import com.eflake.keyanimengine.utils.AlphaUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -389,7 +390,8 @@ public class EFElement extends EFSprite implements IEFElement {
                     if (type == TYPE_ROTATION) {
                         setRotation(realValueX);
                     } else {
-                        setAlpha(realValueX);
+                        //因为paint.setAlpha的参数取值为[0,255]，这里需要转换一下
+                        setAlpha(AlphaUtils.convert(realValueX));
                     }
                 } else {
                     //Scale
@@ -438,7 +440,7 @@ public class EFElement extends EFSprite implements IEFElement {
                     if (type == TYPE_ROTATION) {
                         setRotation(currentValue);
                     } else {
-                        setAlpha(currentValue);
+                        setAlpha(AlphaUtils.convert(currentValue));
                     }
                 } else {
                     //Scale
