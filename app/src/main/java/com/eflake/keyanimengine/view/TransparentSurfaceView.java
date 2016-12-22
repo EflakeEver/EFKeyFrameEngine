@@ -119,10 +119,13 @@ public class TransparentSurfaceView extends EFSurfaceView {
 //        element_parent.addPositionKeyFrame(new EFPosKeyFrame(30, "500.0,700.0"));
 //        element_parent.addPositionKeyFrame(new EFPosKeyFrame(60, "700.0,700.0"));
 //        element_parent.addPositionKeyFrame(new EFPosKeyFrame(90, "1000.0,700.0"));
-        element_parent.addPathKeyFrame(new EFPathKeyFrame(1, "200.0,700.0", "0.0,0.0"));
-        element_parent.addPathKeyFrame(new EFPathKeyFrame(30, "500.0,700.0", "550.0,300.0"));
-        element_parent.addPathKeyFrame(new EFPathKeyFrame(60, "700.0,700.0", "750.0,300.0"));
-        element_parent.addPathKeyFrame(new EFPathKeyFrame(90, "1000.0,700.0", "950.0,300.0"));
+        element_parent.addPathKeyFrame(new EFPathKeyFrame(1, "200.0,700.0", ""));
+        element_parent.addPathKeyFrame(new EFPathKeyFrame(30, "500.0,700.0", ""));
+        element_parent.addPathKeyFrame(new EFPathKeyFrame(60, "700.0,700.0", ""));
+        element_parent.addPathKeyFrame(new EFPathKeyFrame(90, "1000.0,700.0", ""));
+//        element_parent.addPathKeyFrame(new EFPathKeyFrame(30, "500.0,700.0", "550.0,300.0,600.0,250.0"));
+//        element_parent.addPathKeyFrame(new EFPathKeyFrame(60, "700.0,700.0", "750.0,300.0,500.0,200.0"));
+//        element_parent.addPathKeyFrame(new EFPathKeyFrame(90, "1000.0,700.0", "950.0,300.0"));
         element_parent.addRotationKeyFrame(new EFRotationKeyFrame(30, "0.0"));
         element_parent.addRotationKeyFrame(new EFRotationKeyFrame(60, "45.0"));
         element_parent.addRotationKeyFrame(new EFRotationKeyFrame(90, "-45.0"));
@@ -133,6 +136,12 @@ public class TransparentSurfaceView extends EFSurfaceView {
         element_parent.addScaleKeyFrame(new EFScaleKeyFrame(60, "50.0,50.0"));
         element_parent.addScaleKeyFrame(new EFScaleKeyFrame(90, "200.0,200.0"));
         anim.addElement(KEY_PARENT_ELEMENT, element_parent);
+
+        EFElement element_child = new EFElement(mContext, R.mipmap.cucumber, 0, 0);
+        element_child.addPositionKeyFrame(new EFPosKeyFrame(1, "0.0,0.0"));
+        element_child.addPositionKeyFrame(new EFPosKeyFrame(88, "100.0,0.0"));
+        element_child.setParentNode(element_parent);
+        anim.addElement(KEY_CHILD_ELEMENT, element_child);
 
         //添加并执行动画
         EFAnimManager.getInstance().addAnim(KEY_SINGLE_ANIM, anim);

@@ -4,18 +4,23 @@ package com.eflake.keyanimengine.keyframe;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Paint;
+import android.text.TextUtils;
+import android.util.Log;
 import android.view.animation.Interpolator;
 import android.view.animation.LinearInterpolator;
 
-import com.eflake.keyanimengine.evaluator.EFBezier2Evaluator;
 import com.eflake.keyanimengine.evaluator.EFBezierKeepEvaluator;
+import com.eflake.keyanimengine.evaluator.EFBezierSuperEvaluator;
 import com.eflake.keyanimengine.evaluator.EFKeepEvaluator;
 import com.eflake.keyanimengine.evaluator.EFLinearEvaluator;
+import com.eflake.keyanimengine.evaluator.IEFBezierFloatEvaluator;
 import com.eflake.keyanimengine.sprite.EFSprite;
 import com.eflake.keyanimengine.utils.PropertyConvertUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static android.content.ContentValues.TAG;
 
 
 public class EFElement extends EFSprite implements IEFElement {
@@ -25,6 +30,9 @@ public class EFElement extends EFSprite implements IEFElement {
     public static final int TYPE_ALPHA = 2;
     public static final int TYPE_SCALE = 3;
     public static final int TYPE_ROTATION = 4;
+    public static final int NO_CONTROL_POINT_SIZE = 0;
+    public static final int ONE_CONTROL_POINT_SIZE = 2;
+    public static final int TWO_CONTROL_POINT_SIZE = 4;
 
     public String mName;//元素名称
     public List<EFPosKeyFrame> positionKeyFrameList = new ArrayList<>();//位置关键帧集合
@@ -56,7 +64,6 @@ public class EFElement extends EFSprite implements IEFElement {
         initDefaultKeyFrame();
     }
 
-
     public EFElement(Context context, int resId, float startPosX, float startPosY) {
         super(context, resId, startPosX, startPosY);
         initDefaultKeyFrame();
@@ -75,9 +82,9 @@ public class EFElement extends EFSprite implements IEFElement {
     private void initDefaultKeyFrame() {
         //此处的defaultKeyFrame并不放入各个属性List,仅作为初始赋值用
         defaultPosKeyFrame = new EFPosKeyFrame(0, "0,0");
-        defaultAlphaKeyFrame = new EFAlphaKeyFrame(0, "255");
+        defaultAlphaKeyFrame = new EFAlphaKeyFrame(0, "100.0");
         defaultRotationKeyFrame = new EFRotationKeyFrame(0, "0");
-        defaultScaleKeyFrame = new EFScaleKeyFrame(0, "1.0,1.0");
+        defaultScaleKeyFrame = new EFScaleKeyFrame(0, "100.0,100.0");
         defaultPathKeyFrame = new EFPathKeyFrame(0, "0.0,0.0", "0.0,0.0");
     }
 
@@ -198,7 +205,7 @@ public class EFElement extends EFSprite implements IEFElement {
             pathKeyFrame.setEvaluator(new EFBezierKeepEvaluator());
         } else {
             pathKeyFrame.setLastKeyFrame(pathKeyFrameList.get(pathKeyFrameSize - 1));
-            pathKeyFrame.setEvaluator(new EFBezier2Evaluator());
+            pathKeyFrame.setEvaluator(new EFBezierSuperEvaluator());
         }
         pathKeyFrame.setInterpolator(new LinearInterpolator());
         pathKeyFrameList.add(pathKeyFrame);
@@ -237,12 +244,19 @@ public class EFElement extends EFSprite implements IEFElement {
             setCurrentKeyFrameValue(TYPE_ALPHA, pathFrameAreaIndex, animFrameIndex);
         }
 
-        //转换相对坐标为绝对坐标
-        convertRelativeToRealPos();
+        //TODO 如果为子节点，应该把父节点所有属性变换，都应用到子节点中，目前仅支持了Position属性的父子关系，待优化
+        convertParentProperty();
         //转换成对应ViewPort坐标
         convertViewPortPos();
         //设置应用的变换矩阵
         applyMatrix();
+    }
+
+    private void convertParentProperty() {
+        //转换相对坐标为绝对坐标
+        convertRelativeToRealPos();
+        //转换相对Scale为绝对Scale
+//        convertRelativeScaleToRealScale();
     }
 
     private void applyMatrix() {
@@ -354,18 +368,61 @@ public class EFElement extends EFSprite implements IEFElement {
                     }
                     if (type == TYPE_PATH) {
                         String controlValue = ((EFPathKeyFrame) targetKeyFrame).control;
-                        String[] controlValueArray = controlValue.split(",");
-                        float controlValuePosX = Float.valueOf(controlValueArray[0]);
-                        float controlValuePosY = Float.valueOf(controlValueArray[1]);
-
+                        float controlValuePosX = 0.0f;
+                        float controlValuePosY = 0.0f;
+                        float anotherControlValuePosX = 0.0f;
+                        float anotherControlValuePosy = 0.0f;
+                        int controlPointValueArraySize = 0;//control字段解析后的值个数
+                        if (!TextUtils.isEmpty(controlValue) && controlValue.contains(",")) {
+                            String[] controlValueArray = controlValue.split(",");
+                            controlPointValueArraySize = controlValueArray.length;
+                            if (controlPointValueArraySize == ONE_CONTROL_POINT_SIZE) {
+                                controlValuePosX = Float.valueOf(controlValueArray[0]);
+                                controlValuePosY = Float.valueOf(controlValueArray[1]);
+                            } else if (controlPointValueArraySize == TWO_CONTROL_POINT_SIZE) {
+                                controlValuePosX = Float.valueOf(controlValueArray[0]);
+                                controlValuePosY = Float.valueOf(controlValueArray[1]);
+                                anotherControlValuePosX = Float.valueOf(controlValueArray[2]);
+                                anotherControlValuePosy = Float.valueOf(controlValueArray[3]);
+                            } else {
+                                //TODO 非二阶及三阶情况，暂不支持
+                                Log.e(TAG, "else scene");
+                            }
+                        } else {
+                            //一阶情况，control为空，无控制点
+                        }
                         Interpolator interpolator = ((EFPathKeyFrame) targetKeyFrame).interpolator;
                         //计算KeyFrame差值器input,即当前区间的动画执行时间进度百分比
                         float keyframeTimeFraction = (animFrameIndex - lastPosKeyFrameTime) / (float) keyframeDuration;
                         //计算KeyFrame差值器，计算返回后的结果进度百分比
                         float realTimeFraction = interpolator.getInterpolation(keyframeTimeFraction);
                         //计算设置结果
-                        float realValueX = ((EFPathKeyFrame) targetKeyFrame).evaluator.evaluate(realTimeFraction, lastValuePosX, controlValuePosX, currentValuePosX);
-                        float realValueY = ((EFPathKeyFrame) targetKeyFrame).evaluator.evaluate(realTimeFraction, lastValuePosY, controlValuePosY, currentValuePosY);
+                        //需要计算当前控制点个数，据此判断Bezier曲线阶数
+                        IEFBezierFloatEvaluator evaluator = ((EFPathKeyFrame) targetKeyFrame).evaluator;
+                        float realValueX = 0.0f;
+                        float realValueY = 0.0f;
+                        if (evaluator instanceof EFBezierKeepEvaluator) {
+                            realValueX = evaluator.evaluate(realTimeFraction, lastValuePosX, currentValuePosX, IEFBezierFloatEvaluator.TYPE_X);
+                            realValueY = evaluator.evaluate(realTimeFraction, lastValuePosY, currentValuePosY, IEFBezierFloatEvaluator.TYPE_Y);
+                        } else {
+                            switch (controlPointValueArraySize) {
+                                case 0:
+                                    ((EFBezierSuperEvaluator) evaluator).initControlPointList();
+                                    realValueX = evaluator.evaluate(realTimeFraction, lastValuePosX, currentValuePosX, IEFBezierFloatEvaluator.TYPE_X);
+                                    realValueY = evaluator.evaluate(realTimeFraction, lastValuePosY, currentValuePosY, IEFBezierFloatEvaluator.TYPE_Y);
+                                    break;
+                                case ONE_CONTROL_POINT_SIZE:
+                                    ((EFBezierSuperEvaluator) evaluator).initControlPointList(controlValuePosX, controlValuePosY);
+                                    realValueX = evaluator.evaluate(realTimeFraction, lastValuePosX, currentValuePosX, IEFBezierFloatEvaluator.TYPE_X);
+                                    realValueY = evaluator.evaluate(realTimeFraction, lastValuePosY, currentValuePosY, IEFBezierFloatEvaluator.TYPE_Y);
+                                    break;
+                                case TWO_CONTROL_POINT_SIZE:
+                                    ((EFBezierSuperEvaluator) evaluator).initControlPointList(controlValuePosX, controlValuePosY, anotherControlValuePosX, anotherControlValuePosy);
+                                    realValueX = evaluator.evaluate(realTimeFraction, lastValuePosX, currentValuePosX, IEFBezierFloatEvaluator.TYPE_X);
+                                    realValueY = evaluator.evaluate(realTimeFraction, lastValuePosY, currentValuePosY, IEFBezierFloatEvaluator.TYPE_Y);
+                                    break;
+                            }
+                        }
                         setCenterPosX(realValueX);
                         setCenterPosY(realValueY);
                     }
@@ -467,6 +524,7 @@ public class EFElement extends EFSprite implements IEFElement {
     }
 
     public void draw(Canvas canvas, Paint defaultPaint) {
+        //TODO 不同的元素，应采用不同画笔
         defaultPaint.setAlpha((int) mAlpha);
         canvas.drawBitmap(mBitmap, mMatrix, defaultPaint);
     }

@@ -19,7 +19,7 @@ public class EFNode implements IEFNode {
     public int mWidth;//宽度
     public int mHeight;//高度
     public float mRotation;//旋转角度
-    public float mAlpha = 0;//不透明度
+    public float mAlpha = 100.0f;//不透明度
     public float mScaleX = 1.0f;//缩放比例
     public float mScaleY = 1.0f;//缩放比例
     public boolean mShowing;//是否显示
@@ -120,12 +120,31 @@ public class EFNode implements IEFNode {
         convertRelativeToRealPosY();
     }
 
+    /*
+    * 如果是相对Scale，转换为绝对Scale
+    * */
+    /*protected void convertRelativeScaleToRealScale() {
+        convertRelativeScaleToRealScaleX();
+        convertRelativeScaleToRealScaleY();
+    }
+
+    private void convertRelativeScaleToRealScaleX() {
+        if (getParentNode() != null) {
+            mScaleX = mScaleX + getParentNode().mScaleX;
+        }
+    }
+
+    private void convertRelativeScaleToRealScaleY() {
+        if (getParentNode() != null) {
+            mScaleY = mScaleY + getParentNode().mScaleY;
+        }
+    }*/
+
     protected void setRotation(float rotation) {
         mRotation = rotation;
     }
 
     protected void setAlpha(float alpha) {
-        //TODO 这里的参数alpha,传入时一般是百分比数字(不含百分号),如果是设置给Paint,只能是[0,255]区间,需要考虑转化
         mAlpha = alpha;
     }
 

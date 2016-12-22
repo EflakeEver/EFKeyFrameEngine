@@ -17,7 +17,7 @@ import com.eflake.keyanimengine.utils.LoadImgUtils;
 
 public class EFSurfaceView extends EFSurfaceViewBase implements SurfaceHolder.Callback, Runnable {
 
-    private static final long REFRESH_SLEEP_TIME = 30; //绘制频率,默认为100ms,即1秒绘制10次
+    private static final long REFRESH_SLEEP_TIME = 33; //绘制频率,默认为100ms,即1秒绘制10次
     protected int mCanvasWidth;
     protected int mCanvasHeight;
     protected Thread animThread;
@@ -118,7 +118,7 @@ public class EFSurfaceView extends EFSurfaceViewBase implements SurfaceHolder.Ca
             }
             long drawTime = (System.currentTimeMillis() - startTime);
             Log.e("eflake", "draw time = " + drawTime);
-            if (drawTime <= 30) {
+            if (drawTime <= REFRESH_SLEEP_TIME) {
                 mDeltaTime = REFRESH_SLEEP_TIME - drawTime;
             } else {
                 mDeltaTime = drawTime;
