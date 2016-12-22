@@ -119,10 +119,13 @@ public class TransparentSurfaceView extends EFSurfaceView {
 //        element_parent.addPositionKeyFrame(new EFPosKeyFrame(30, "500.0,700.0"));
 //        element_parent.addPositionKeyFrame(new EFPosKeyFrame(60, "700.0,700.0"));
 //        element_parent.addPositionKeyFrame(new EFPosKeyFrame(90, "1000.0,700.0"));
-        element_parent.addPathKeyFrame(new EFPathKeyFrame(1, "200.0,700.0", "0.0,0.0"));
-        element_parent.addPathKeyFrame(new EFPathKeyFrame(30, "500.0,700.0", "550.0,300.0,600.0,250.0"));
-        element_parent.addPathKeyFrame(new EFPathKeyFrame(60, "700.0,700.0", "750.0,300.0,500.0,200.0"));
-        element_parent.addPathKeyFrame(new EFPathKeyFrame(90, "1000.0,700.0", "950.0,300.0"));
+        element_parent.addPathKeyFrame(new EFPathKeyFrame(1, "200.0,700.0", ""));
+        element_parent.addPathKeyFrame(new EFPathKeyFrame(30, "500.0,700.0", ""));
+        element_parent.addPathKeyFrame(new EFPathKeyFrame(60, "700.0,700.0", ""));
+        element_parent.addPathKeyFrame(new EFPathKeyFrame(90, "1000.0,700.0", ""));
+//        element_parent.addPathKeyFrame(new EFPathKeyFrame(30, "500.0,700.0", "550.0,300.0,600.0,250.0"));
+//        element_parent.addPathKeyFrame(new EFPathKeyFrame(60, "700.0,700.0", "750.0,300.0,500.0,200.0"));
+//        element_parent.addPathKeyFrame(new EFPathKeyFrame(90, "1000.0,700.0", "950.0,300.0"));
         element_parent.addRotationKeyFrame(new EFRotationKeyFrame(30, "0.0"));
         element_parent.addRotationKeyFrame(new EFRotationKeyFrame(60, "45.0"));
         element_parent.addRotationKeyFrame(new EFRotationKeyFrame(90, "-45.0"));

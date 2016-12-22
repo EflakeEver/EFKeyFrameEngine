@@ -80,6 +80,10 @@ public class EFBezierSuperEvaluator implements IEFBezierFloatEvaluator {
         }
     }
 
+    public void initControlPointList() {
+        resetList();
+    }
+
 //    @Override
 //    public float evaluate(float fraction, float startValue, float controlValue, float endValue) {
 //        float leftFraction = 1.0f - fraction;
