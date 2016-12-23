@@ -8,4 +8,9 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
+    <style name="Real.Splash" parent="AppTheme">
+    <item name="windowNoTitle">true</item>
+    <item name="android:windowFullscreen">true</item>
+    </style>
+
 </resources>

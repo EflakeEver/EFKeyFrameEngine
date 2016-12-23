@@ -36,6 +36,16 @@ public class TransparentSurfaceView extends EFSurfaceView {
     private EFSprite mCucumberResAnchorSprite;
     private EFSprite mFireworkFileSprite;
     private EFSprite mFireworkFileAnchorSprite;
+    private EFAnim animDemo;
+    private int i;
+
+    public EFAnim getAnimDemo() {
+        return animDemo;
+    }
+
+    public void setAnimDemo(EFAnim animDemo) {
+        this.animDemo = animDemo;
+    }
 
     public TransparentSurfaceView(Context context, int width, int height) {
         super(context, width, height);
@@ -116,54 +126,6 @@ public class TransparentSurfaceView extends EFSurfaceView {
 
 
         //TODO 红包动画
-        String animDirPath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/red_package/";  //json文件和动画图片所在的文件夹
-        String jsonPath = animDirPath + "red_package_json.json";
-        String a = JsonUtil.readFile(jsonPath, getContext());
-        AnimEntity animEntity;
-        animEntity = JsonUtil.jsonTobean(a, AnimEntity.class);
-        EFAnim anim1 = new EFAnim();
-        anim1.setDuration(animEntity.getAnim().getDuration());
-        anim1.setName(animEntity.getAnim().getName());
-        anim1.setViewPort(new EFViewPort(1080.0f, 1920.0f));
-        for (AnimEntity.AnimBean.ElementsBean efElement : animEntity.getAnim().getElements()) {
-            EFElement element = new EFElement(mContext, animDirPath + efElement.getName() + ".png", 0, 0);
-            if (efElement.getPosition() != null) {
-                for (AnimEntity.AnimBean.ElementsBean.PositionBean positionBean : efElement.getPosition()) {
-                    element.addPositionKeyFrame(new EFPosKeyFrame(positionBean.getTime(), positionBean.getValue()));
-                }
-            }
-
-            if (efElement.getAlpha() != null) {
-                for (AnimEntity.AnimBean.ElementsBean.AlphaBean alphaBean : efElement.getAlpha()) {
-                    element.addAlphaKeyFrame(new EFAlphaKeyFrame(alphaBean.getTime(), alphaBean.getValue()));
-                }
-            } else {
-                element.addAlphaKeyFrame(new EFAlphaKeyFrame(1, "100.0"));
-            }
-
-            if (efElement.getRotation() != null) {
-                for (AnimEntity.AnimBean.ElementsBean.RotationBean rotationBean : efElement.getRotation()) {
-                    element.addRotationKeyFrame(new EFRotationKeyFrame(rotationBean.getTime(), rotationBean.getValue()));
-                }
-            }
-
-            if (efElement.getPath() != null) {
-                for (AnimEntity.AnimBean.ElementsBean.PathBean pathBean : efElement.getPath()) {
-                    element.addPathKeyFrame(new EFPathKeyFrame(pathBean.getTime(), pathBean.getValue(), pathBean.getControl()));
-                }
-            }
-
-            if (efElement.getScale() != null) {
-                for (AnimEntity.AnimBean.ElementsBean.ScaleBean scaleBean : efElement.getScale()) {
-                    element.addScaleKeyFrame(new EFScaleKeyFrame(scaleBean.getTime(), scaleBean.getValue()));
-                }
-            }
-
-            anim1.addElement(efElement.getName(), element);
-
-        }
-        EFAnimManager.getInstance().addAnim(KEY_RED_PACKET_ELEMENT, anim1);
-        EFAnimManager.getInstance().startAnimByKey(KEY_RED_PACKET_ELEMENT);
 
 
         //TODO 曲线路径移动
@@ -209,6 +171,76 @@ public class TransparentSurfaceView extends EFSurfaceView {
 //            }
 //        }, 1000 * 3);
 
+    }
+
+
+    public void addAnimDemo() {
+        String animDirPath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/red_package/";  //json文件和动画图片所在的文件夹
+//        String animDirPath = mContext.getExternalCacheDir();
+        String jsonPath = animDirPath + "red_package_json.json";
+        String a = JsonUtil.readFile(jsonPath, getContext());
+        AnimEntity animEntity;
+        animEntity = JsonUtil.jsonTobean(a, AnimEntity.class);
+        EFAnim anim1 = new EFAnim();
+        anim1.setDuration(animEntity.getAnim().getDuration());
+        anim1.setName(animEntity.getAnim().getName());
+        anim1.setViewPort(new EFViewPort(1080.0f, 1920.0f));
+        EFElement element = null;
+        for (AnimEntity.AnimBean.ElementsBean efElement : animEntity.getAnim().getElements()) {
+            if (efElement.getName().equals("red_packet")) {
+                element = new EFElement(mContext, R.mipmap.red_packet, 0, 0);
+            } else if (efElement.getName().equals("m1")) {
+                element = new EFElement(mContext, R.mipmap.m1, 0, 0);
+            } else if (efElement.getName().equals("m2")) {
+                element = new EFElement(mContext, R.mipmap.m2, 0, 0);
+            } else if (efElement.getName().equals("m4")) {
+                element = new EFElement(mContext, R.mipmap.m4, 0, 0);
+
+            } else if (efElement.getName().equals("g1")) {
+                element = new EFElement(mContext, R.mipmap.g1, 0, 0);
+
+            } else if (efElement.getName().equals("g2")) {
+                element = new EFElement(mContext, R.mipmap.g2, 0, 0);
+            }
+
+            if (efElement.getPosition() != null) {
+                for (AnimEntity.AnimBean.ElementsBean.PositionBean positionBean : efElement.getPosition()) {
+                    element.addPositionKeyFrame(new EFPosKeyFrame(positionBean.getTime(), positionBean.getValue()));
+                }
+            }
+
+            if (efElement.getAlpha() != null) {
+                for (AnimEntity.AnimBean.ElementsBean.AlphaBean alphaBean : efElement.getAlpha()) {
+                    element.addAlphaKeyFrame(new EFAlphaKeyFrame(alphaBean.getTime(), alphaBean.getValue()));
+                }
+            } else {
+                element.addAlphaKeyFrame(new EFAlphaKeyFrame(1, "100.0"));
+            }
+
+            if (efElement.getRotation() != null) {
+                for (AnimEntity.AnimBean.ElementsBean.RotationBean rotationBean : efElement.getRotation()) {
+                    element.addRotationKeyFrame(new EFRotationKeyFrame(rotationBean.getTime(), rotationBean.getValue()));
+                }
+            }
+
+            if (efElement.getPath() != null) {
+                for (AnimEntity.AnimBean.ElementsBean.PathBean pathBean : efElement.getPath()) {
+                    element.addPathKeyFrame(new EFPathKeyFrame(pathBean.getTime(), pathBean.getValue(), pathBean.getControl()));
+                }
+            }
+
+            if (efElement.getScale() != null) {
+                for (AnimEntity.AnimBean.ElementsBean.ScaleBean scaleBean : efElement.getScale()) {
+                    element.addScaleKeyFrame(new EFScaleKeyFrame(scaleBean.getTime(), scaleBean.getValue()));
+                }
+            }
+
+            anim1.addElement(efElement.getName(), element);
+
+        }
+        EFAnimManager.getInstance().addAnim(i + "", anim1);
+        EFAnimManager.getInstance().startAnimByKey(i + "");
+        i++;
     }
 
     private String getFramePathByName(String frameName) {

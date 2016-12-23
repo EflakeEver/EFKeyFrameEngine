@@ -26,8 +26,8 @@ public class JsonUtil {
     public static String readFile(String filePath, Context context) {
         String jsonContent = "";
         try {
-            FileInputStream fileInputStream = new FileInputStream(filePath);
-            BufferedReader reader = new BufferedReader(new InputStreamReader(fileInputStream, "UTF-8"));
+//            FileInputStream fileInputStream = new FileInputStream(filePath);
+            BufferedReader reader = new BufferedReader(new InputStreamReader(context.getResources().getAssets().open("red_package_json.json"), "UTF-8"));
             String singleLine;
             while ((singleLine = reader.readLine()) != null) {
                 jsonContent += singleLine;

@@ -3,6 +3,7 @@ package com.eflake.keyanimengine.keyframe;
 
 import android.graphics.Canvas;
 import android.graphics.Paint;
+import android.util.Log;
 
 import com.eflake.keyanimengine.scheduler.IEFUpdate;
 
@@ -40,6 +41,16 @@ public class EFAnimManager implements IEFAnimManager, IEFUpdate {
     @Override
     public boolean removeAnimByKey(String key) {
         if (mAnims.containsKey(key)) {
+            Iterator<Map.Entry<String,EFElement>> iterator = mAnims.get(key).mElements.entrySet().iterator();
+            if(iterator.hasNext()){
+                Map.Entry<String, EFElement> entry = iterator.next();
+                if(!entry.getValue().mBitmap.isRecycled()&&entry.getValue().mBitmap!=null) {
+                    Log.d("zxy","bitmap_recycle");
+                    entry.getValue().mBitmap.recycle();
+                    entry.getValue().mBitmap = null;
+                }
+            }
+            System.gc();
             mAnims.remove(key);
             return true;
         } else {

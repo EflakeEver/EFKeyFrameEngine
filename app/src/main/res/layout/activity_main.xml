@@ -5,7 +5,7 @@
     android:id="@+id/activity_main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@mipmap/fake_content"
+    android:background="@mipmap/ddlive_bg"
     tools:context="com.eflake.keyanimengine.main.MainActivity">
 
     <TextView
@@ -15,6 +15,21 @@
         android:layout_centerInParent="true"
         android:textColor="@color/black"
         android:text="@string/engine_name"/>
+
+    <Button
+        android:id="@+id/bt_start"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentBottom="true"
+        android:text="start"/>
+
+    <Button
+        android:id="@+id/bt_end"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:text="end"/>
 
     <com.eflake.keyanimengine.view.TransparentSurfaceView
         android:id="@+id/transparentAnimView"
