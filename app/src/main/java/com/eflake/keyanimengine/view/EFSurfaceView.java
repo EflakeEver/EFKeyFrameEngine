@@ -31,6 +31,7 @@ public class EFSurfaceView extends EFSurfaceViewBase implements SurfaceHolder.Ca
     public int mPositionY = 100;
     public Matrix mMatrix;
     public Rect mRect;
+    private boolean mNeedSkipFrame;
 
     public EFSurfaceView(Context context, int width, int height) {
         this(context);
@@ -119,9 +120,11 @@ public class EFSurfaceView extends EFSurfaceViewBase implements SurfaceHolder.Ca
             long drawTime = (System.currentTimeMillis() - startTime);
             Log.e("eflake", "draw time = " + drawTime);
             if (drawTime <= REFRESH_SLEEP_TIME) {
+                mNeedSkipFrame = false;
                 mDeltaTime = REFRESH_SLEEP_TIME - drawTime;
             } else {
-                mDeltaTime = drawTime;
+                mNeedSkipFrame = true;
+                mDeltaTime = 0;
             }
             try {
                 Thread.sleep(mDeltaTime);
@@ -135,8 +138,6 @@ public class EFSurfaceView extends EFSurfaceViewBase implements SurfaceHolder.Ca
     * 初始化图片资源
     * */
     protected void initSprite() {
-//        mCucumberResAnchorSprite = new EFSprite(mContext, R.mipmap.cucumber_new, 100, 100, EFSprite.ANCHOR_POINT_TYPE_CENTER);
-
     }
 
     /*

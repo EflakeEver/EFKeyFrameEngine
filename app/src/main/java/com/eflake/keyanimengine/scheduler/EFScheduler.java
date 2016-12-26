@@ -9,6 +9,7 @@ import com.eflake.keyanimengine.keyframe.EFAnimManager;
 
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 /*
@@ -17,7 +18,7 @@ import java.util.Map;
 public class EFScheduler implements IEFScheduler {
 
     public static final String TAG = EFScheduler.class.getSimpleName();
-    private HashMap<String, IEFUpdate> observers = new HashMap<>();
+    private HashMap<String, IEFUpdate> observers = new LinkedHashMap<>();
 
     private EFScheduler() {
     }
@@ -86,7 +87,7 @@ public class EFScheduler implements IEFScheduler {
         //清屏操作
         defaultPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
         canvas.drawPaint(defaultPaint);
-        defaultPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC));
+        defaultPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_OVER));
 
         Iterator drawIterator = observers.entrySet().iterator();
         while (drawIterator.hasNext()) {

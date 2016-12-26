@@ -2,49 +2,6 @@
 "anim":{
       "elements":[
        {
-       "name":"red_packet",
-       "position":[
-        {
-          "time":0,
-          "value":"540.0,-300.0"
-        },
-        {
-          "time":12,
-          "value":"540.0,277.5"
-        }
-       ],
-       "rotation":[
-         {
-          "time":12,
-          "value":"60.0"
-         },
-         {
-          "time":20,
-          "value":"18.0"
-         },
-         {
-          "time":26,
-          "value":"-11.0"
-         },
-         {
-          "time":30,
-          "value":"10.0"
-         },
-         {
-          "time":33,
-          "value":"-5.0"
-         },
-         {
-          "time":36,
-          "value":"4.0"
-         },
-         {
-          "time":38,
-          "value":"0.0"
-         }
-       ]
-       },
-       {
         "name":"m2",
         "path":[
          {
@@ -137,6 +94,48 @@
           "time":46,
           "value":"672.0,2007.0",
           "control":"264.0,1040.0,884.0,1464.0"
+         }
+        ]
+       }, {
+        "name":"red_packet",
+        "position":[
+         {
+          "time":0,
+          "value":"540.0,-300.0"
+         },
+         {
+          "time":12,
+          "value":"540.0,277.5"
+         }
+        ],
+        "rotation":[
+         {
+          "time":12,
+          "value":"60.0"
+         },
+         {
+          "time":20,
+          "value":"18.0"
+         },
+         {
+          "time":26,
+          "value":"-11.0"
+         },
+         {
+          "time":30,
+          "value":"10.0"
+         },
+         {
+          "time":33,
+          "value":"-5.0"
+         },
+         {
+          "time":36,
+          "value":"4.0"
+         },
+         {
+          "time":38,
+          "value":"0.0"
          }
         ]
        }

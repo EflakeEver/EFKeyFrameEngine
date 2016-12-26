@@ -41,11 +41,11 @@ public class EFAnimManager implements IEFAnimManager, IEFUpdate {
     @Override
     public boolean removeAnimByKey(String key) {
         if (mAnims.containsKey(key)) {
-            Iterator<Map.Entry<String,EFElement>> iterator = mAnims.get(key).mElements.entrySet().iterator();
-            if(iterator.hasNext()){
+            Iterator<Map.Entry<String, EFElement>> iterator = mAnims.get(key).mElements.entrySet().iterator();
+            if (iterator.hasNext()) {
                 Map.Entry<String, EFElement> entry = iterator.next();
-                if(!entry.getValue().mBitmap.isRecycled()&&entry.getValue().mBitmap!=null) {
-                    Log.d("zxy","bitmap_recycle");
+                if (!entry.getValue().mBitmap.isRecycled() && entry.getValue().mBitmap != null) {
+                    Log.d("zxy", "bitmap_recycle");
                     entry.getValue().mBitmap.recycle();
                     entry.getValue().mBitmap = null;
                 }
@@ -104,7 +104,7 @@ public class EFAnimManager implements IEFAnimManager, IEFUpdate {
             }
             //如果动画正在进行,则调用step方法
             if (currentAnim.isRunning()) {
-                currentAnim.draw(canvas,defaultPaint);
+                currentAnim.draw(canvas, defaultPaint);
             }
         }
     }

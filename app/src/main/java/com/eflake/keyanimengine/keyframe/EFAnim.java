@@ -8,11 +8,12 @@ import com.eflake.keyanimengine.utils.ScreenDimenUtils;
 
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class EFAnim implements IEFAnim {
     public long mDurationFrame;//总帧数
-    public HashMap<String, EFElement> mElements = new HashMap<>();//子元素
+    public HashMap<String, EFElement> mElements = new LinkedHashMap<>();//子元素
     public String mName;//动画名称
     public long mElapsedFrame;//动画已运行帧数
     public EFViewPort mViewport;//显示的ViewPort
