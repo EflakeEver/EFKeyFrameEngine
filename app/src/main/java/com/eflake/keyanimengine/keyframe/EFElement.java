@@ -47,7 +47,14 @@ public class EFElement extends EFSprite implements IEFElement {
     public EFRotationKeyFrame defaultRotationKeyFrame;
     public EFAlphaKeyFrame defaultAlphaKeyFrame;
     public EFAnim mAnim;
-
+    private float mRealCenterX;
+    private float mRealCenterY;
+    private float mRealStartX;
+    private float mRealStartY;
+    private float mRealRotation;//旋转角度
+    private float mRealAlpha = 100.0f;//不透明度
+    private float mRealScaleX = 1.0f;//缩放比例
+    private float mRealScaleY = 1.0f;//缩放比例
 
     public EFElement(Context context, String path, int startPosX, int startPosY) {
         super(context, path, startPosX, startPosY);
@@ -244,26 +251,63 @@ public class EFElement extends EFSprite implements IEFElement {
             setCurrentKeyFrameValue(TYPE_ALPHA, pathFrameAreaIndex, animFrameIndex);
         }
 
-        //TODO 如果为子节点，应该把父节点所有属性变换，都应用到子节点中，目前仅支持了Position属性的父子关系，待优化
-        convertParentProperty();
+        if (getParentNode() != null) {
+            //把所有属性的相对坐标，转换为绝对坐标
+            convertParentProperty();
+        } else {
+            initRealValue();
+        }
         //转换成对应ViewPort坐标
         convertViewPortPos();
+        //根据中心点的绝对坐标，计算左上角点的绝对坐标
+        computeRealStartPos();
+        //
+        convertAlpha();
         //设置应用的变换矩阵
         applyMatrix();
     }
 
+    private void convertAlpha() {
+        mRealAlpha = PropertyConvertUtils.convertAlpha(mRealAlpha);
+    }
+
     private void convertParentProperty() {
         //转换相对坐标为绝对坐标
-        convertRelativeToRealPos();
-        //转换相对Scale为绝对Scale
-//        convertRelativeScaleToRealScale();
+        mRealCenterX = convertRelativeToRealPosX();
+        mRealCenterY = convertRelativeToRealPosY();
+        mRealRotation = convertRelativeToRealRotation();
+        mRealAlpha = convertRelativeToRealAlpha();
+        mRealScaleX = convertRelativeToRealScaleX();
+        mRealScaleY = convertRelativeToRealScaleY();
     }
+
+    private void initRealValue() {
+        mRealStartX = mStartPosX;
+        mRealStartY = mStartPosY;
+        mRealCenterX = mCenterPosX;
+        mRealCenterY = mCenterPosY;
+        mRealRotation = mRotation;
+        mRealAlpha = mAlpha;
+        mRealScaleX = mScaleX;
+        mRealScaleY = mScaleY;
+    }
+
+    private void computeRealStartPos() {
+        mRealStartX = mRealCenterX - mWidth / 2;
+        mRealStartY = mRealCenterY - mHeight / 2;
+    }
+
+    private void convertViewPortPos() {
+        mRealCenterX = convertViewPortPosX(mRealCenterX);
+        mRealCenterY = convertViewPortPosY(mRealCenterY);
+    }
+
 
     private void applyMatrix() {
         mMatrix = getMatrix();
-        mMatrix.setTranslate(mStartPosX, mStartPosY);
-        mMatrix.preScale(mScaleX, mScaleY, mBitmap.getWidth() / 2, mBitmap.getHeight() / 2);
-        mMatrix.preRotate(mRotation, mBitmap.getWidth() / 2, mBitmap.getHeight() / 2);
+        mMatrix.setTranslate(mRealStartX, mRealStartY);
+        mMatrix.preScale(mRealScaleX, mRealScaleY, mBitmap.getWidth() / 2, mBitmap.getHeight() / 2);
+        mMatrix.preRotate(mRealRotation, mBitmap.getWidth() / 2, mBitmap.getHeight() / 2);
     }
 
     private int judgeFrameArea(int type, long currentAnimFrameIndex) {
@@ -447,8 +491,7 @@ public class EFElement extends EFSprite implements IEFElement {
                     if (type == TYPE_ROTATION) {
                         setRotation(realValueX);
                     } else {
-                        //因为paint.setAlpha的参数取值为[0,255]，这里需要转换一下
-                        setAlpha(PropertyConvertUtils.convertAlpha(realValueX));
+                        setAlpha(realValueX);
                     }
                 } else {
                     //Scale
@@ -497,7 +540,7 @@ public class EFElement extends EFSprite implements IEFElement {
                     if (type == TYPE_ROTATION) {
                         setRotation(currentValue);
                     } else {
-                        setAlpha(PropertyConvertUtils.convertAlpha(currentValue));
+                        setAlpha(currentValue);
                     }
                 } else {
                     //Scale
@@ -516,16 +559,29 @@ public class EFElement extends EFSprite implements IEFElement {
 
     }
 
-    private void convertViewPortPos() {
+    private float convertViewPortPosX(float realCenterX) {
+        float result;
         if (getAnim() != null) {
-            setCenterPosX(getAnim().getViewPortPosX(mCenterPosX));
-            setCenterPosY(getAnim().getViewPortPosY(mCenterPosY));
+            result = getAnim().getViewPortPosX(realCenterX);
+            return result;
+        } else {
+            return realCenterX;
+        }
+    }
+
+    private float convertViewPortPosY(float realCenterY) {
+        float result;
+        if (getAnim() != null) {
+            result = getAnim().getViewPortPosY(realCenterY);
+            return result;
+        } else {
+            return realCenterY;
         }
     }
 
     public void draw(Canvas canvas, Paint defaultPaint) {
         //TODO 不同的元素，应采用不同画笔
-        defaultPaint.setAlpha((int) mAlpha);
+        defaultPaint.setAlpha((int) mRealAlpha);
         canvas.drawBitmap(mBitmap, mMatrix, defaultPaint);
     }
 

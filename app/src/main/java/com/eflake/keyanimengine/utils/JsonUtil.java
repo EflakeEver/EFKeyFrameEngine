@@ -1,15 +1,10 @@
 package com.eflake.keyanimengine.utils;
 
 import android.content.Context;
-import android.os.Environment;
 
 import com.google.gson.Gson;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
-
 import java.io.BufferedReader;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -27,7 +22,7 @@ public class JsonUtil {
         String jsonContent = "";
         try {
 //            FileInputStream fileInputStream = new FileInputStream(filePath);
-            BufferedReader reader = new BufferedReader(new InputStreamReader(context.getResources().getAssets().open("red_package_json.json"), "UTF-8"));
+            BufferedReader reader = new BufferedReader(new InputStreamReader(context.getResources().getAssets().open("yinke_moto_json.json"), "UTF-8"));
             String singleLine;
             while ((singleLine = reader.readLine()) != null) {
                 jsonContent += singleLine;

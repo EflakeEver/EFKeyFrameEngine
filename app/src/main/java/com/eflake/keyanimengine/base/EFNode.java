@@ -93,52 +93,79 @@ public class EFNode implements IEFNode {
     /*
     * X相对坐标转绝对坐标
     * */
-    protected void convertRelativeToRealPosX() {
+    protected float convertRelativeToRealPosX() {
+        float result = 0.0f;
         //如果在设置之前的计算，全是基于相对坐标，那么最后在设置真正坐标时，需要把相对坐标转化成绝对坐标
         if (getParentNode() != null) {
-            mCenterPosX = mCenterPosX + getParentNode().mCenterPosX;
-            mStartPosX = mCenterPosX - mWidth / 2;
+            result = mCenterPosX + getParentNode().mStartPosX;
+            return result;
+        } else {
+            return mCenterPosX;
         }
     }
 
     /*
     * Y相对坐标转绝对坐标
     * */
-    protected void convertRelativeToRealPosY() {
+    protected float convertRelativeToRealPosY() {
+        float result = 0.0f;
         //如果在设置之前的计算，全是基于相对坐标，那么最后在设置真正坐标时，需要把相对坐标转化成绝对坐标
         if (getParentNode() != null) {
-            mCenterPosY = mCenterPosY + getParentNode().mCenterPosY;
-            mStartPosY = mCenterPosY - mHeight / 2;
+            result = mCenterPosY + getParentNode().mStartPosY;
+            return result;
+        } else {
+            return mCenterPosY;
         }
     }
 
     /*
-    * 如果计算的坐标是相对坐标，转换成绝对坐标
+    * 转换相对Scale为绝对Scale
     * */
-    protected void convertRelativeToRealPos() {
-        convertRelativeToRealPosX();
-        convertRelativeToRealPosY();
+    protected float convertRelativeToRealScaleY() {
+        float result = 0.0f;
+        if (getParentNode() != null) {
+            result = mScaleY * getParentNode().mScaleY;
+            return result;
+        } else {
+            return mScaleY;
+        }
+    }
+
+    protected float convertRelativeToRealScaleX() {
+        float result = 0.0f;
+        if (getParentNode() != null) {
+            result = mScaleX * getParentNode().mScaleX;
+            return result;
+        } else {
+            return mScaleX;
+        }
     }
 
     /*
-    * 如果是相对Scale，转换为绝对Scale
+    * 转换相对Alpha为绝对Alpha
     * */
-    /*protected void convertRelativeScaleToRealScale() {
-        convertRelativeScaleToRealScaleX();
-        convertRelativeScaleToRealScaleY();
-    }
-
-    private void convertRelativeScaleToRealScaleX() {
+    protected float convertRelativeToRealAlpha() {
+        float result = 0.0f;
         if (getParentNode() != null) {
-            mScaleX = mScaleX + getParentNode().mScaleX;
+            result = mAlpha * getParentNode().mAlpha / 100;
+            return result;
+        } else {
+            return mAlpha;
         }
     }
 
-    private void convertRelativeScaleToRealScaleY() {
+    /*
+    * 转换相对Rotation为绝对Rotation
+    * */
+    protected float convertRelativeToRealRotation() {
+        float result = 0.0f;
         if (getParentNode() != null) {
-            mScaleY = mScaleY + getParentNode().mScaleY;
+            result = mRotation + getParentNode().mRotation;
+            return result;
+        } else {
+            return mRotation;
         }
-    }*/
+    }
 
     protected void setRotation(float rotation) {
         mRotation = rotation;
@@ -162,8 +189,8 @@ public class EFNode implements IEFNode {
 
     public void setParentNode(EFNode parentNode) {
         //设置父节点之前，先将设置坐标为父节点中心位置
-        setCenterPosX(parentNode.mCenterPosX);
-        setCenterPosY(parentNode.mCenterPosY);
+        setCenterPosX(0.0f);
+        setCenterPosY(0.0f);
         mParentNode = parentNode;
     }
 }

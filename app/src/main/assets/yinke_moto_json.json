@@ -1,0 +1,67 @@
+{
+"anim":{
+      "elements":[
+       {
+        "name":"motor_body",
+        "path":[
+         {
+          "time":0,
+          "value":"1436.0,744.0"
+         },
+         {
+          "time":90,
+          "value":"-332.0,1248.0",
+          "control":"736.0,520.0,248.0,1320.0"
+         }
+        ]
+       },
+       {
+        "name":"motor_inke",
+        "path":[
+         {
+          "time":0,
+          "value":"424.5,47.0"
+         }
+        ],"parent":"motor_body"
+       },
+       {
+        "name":"motor_wheel",
+        "path":[
+         {
+          "time":0,
+          "value":"135.3,282.3"
+         }
+        ],"rotation":[
+        {
+         "time":3,
+         "value":"0.0"
+        },
+        {
+         "time": 90,
+         "value": "1800.0"
+        }
+       ],"parent":"motor_body"
+       },
+       {
+        "name":"motor_shine_back",
+        "path":[
+         {
+          "time":0,
+          "value":"499.1,230.1"
+         }
+        ],"parent":"motor_body"
+       },
+        {
+        "name":"motor_shine_front",
+        "position":[
+         {
+          "time":0,
+          "value":"127.1,278.1"
+         }
+        ],"parent":"motor_body"
+       }
+	],
+        "name":"yinke_motor",
+        "duration":90
+	}
+}

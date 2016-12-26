@@ -4,8 +4,8 @@ package com.eflake.keyanimengine.view;
 import android.content.Context;
 import android.graphics.PixelFormat;
 import android.os.Environment;
+import android.text.TextUtils;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.SurfaceHolder;
 
 import com.eflake.keyanimengine.bean.AnimEntity;
@@ -129,55 +129,57 @@ public class TransparentSurfaceView extends EFSurfaceView {
 
 
         //TODO 曲线路径移动
-//        EFAnim anim = new EFAnim();
-//        anim.setDuration(100);
-//        anim.setViewPort(new EFViewPort(1080.0f, 1920.0f));
-//        EFElement element_parent = new EFElement(mContext, R.mipmap.mitao, 0, 0);
+        EFAnim anim = new EFAnim();
+        anim.setDuration(1000);
+        anim.setViewPort(new EFViewPort(1080.0f, 1920.0f));
+        EFElement element_parent = new EFElement(mContext, R.mipmap.mitao, 0, 0);
 //        element_parent.addPositionKeyFrame(new EFPosKeyFrame(1, "200.0,700.0"));
-////        element_parent.addPositionKeyFrame(new EFPosKeyFrame(30, "500.0,700.0"));
-////        element_parent.addPositionKeyFrame(new EFPosKeyFrame(60, "700.0,700.0"));
-////        element_parent.addPositionKeyFrame(new EFPosKeyFrame(90, "1000.0,700.0"));
-//        element_parent.addPathKeyFrame(new EFPathKeyFrame(1, "200.0,700.0", ""));
-//        element_parent.addPathKeyFrame(new EFPathKeyFrame(30, "500.0,700.0", ""));
-//        element_parent.addPathKeyFrame(new EFPathKeyFrame(60, "700.0,700.0", ""));
+//        element_parent.addPositionKeyFrame(new EFPosKeyFrame(30, "500.0,700.0"));
+//        element_parent.addPositionKeyFrame(new EFPosKeyFrame(60, "700.0,700.0"));
+//        element_parent.addPositionKeyFrame(new EFPosKeyFrame(90, "1000.0,700.0"));
+        element_parent.addPathKeyFrame(new EFPathKeyFrame(1, "200.0,700.0", ""));
+        element_parent.addPathKeyFrame(new EFPathKeyFrame(30, "500.0,700.0", ""));
+        element_parent.addPathKeyFrame(new EFPathKeyFrame(88, "700.0,700.0", ""));
 //        element_parent.addPathKeyFrame(new EFPathKeyFrame(90, "1000.0,700.0", ""));
-////        element_parent.addPathKeyFrame(new EFPathKeyFrame(30, "500.0,700.0", "550.0,300.0,600.0,250.0"));
-////        element_parent.addPathKeyFrame(new EFPathKeyFrame(60, "700.0,700.0", "750.0,300.0,500.0,200.0"));
-////        element_parent.addPathKeyFrame(new EFPathKeyFrame(90, "1000.0,700.0", "950.0,300.0"));
+//        element_parent.addPathKeyFrame(new EFPathKeyFrame(30, "500.0,700.0", "550.0,300.0,600.0,250.0"));
+//        element_parent.addPathKeyFrame(new EFPathKeyFrame(60, "700.0,700.0", "750.0,300.0,500.0,200.0"));
+//        element_parent.addPathKeyFrame(new EFPathKeyFrame(90, "1000.0,700.0", "950.0,300.0"));
 //        element_parent.addRotationKeyFrame(new EFRotationKeyFrame(30, "0.0"));
 //        element_parent.addRotationKeyFrame(new EFRotationKeyFrame(60, "45.0"));
 //        element_parent.addRotationKeyFrame(new EFRotationKeyFrame(90, "-45.0"));
-//        element_parent.addAlphaKeyFrame(new EFAlphaKeyFrame(30, "100.0"));
-//        element_parent.addAlphaKeyFrame(new EFAlphaKeyFrame(60, "50.0"));
-//        element_parent.addAlphaKeyFrame(new EFAlphaKeyFrame(90, "100.0"));
-//        element_parent.addScaleKeyFrame(new EFScaleKeyFrame(30, "100.0,100.0"));
-//        element_parent.addScaleKeyFrame(new EFScaleKeyFrame(60, "50.0,50.0"));
-//        element_parent.addScaleKeyFrame(new EFScaleKeyFrame(90, "200.0,200.0"));
-//        anim.addElement(KEY_PARENT_ELEMENT, element_parent);
-//
-//        EFElement element_child = new EFElement(mContext, R.mipmap.cucumber, 0, 0);
-//        element_child.addPositionKeyFrame(new EFPosKeyFrame(1, "0.0,0.0"));
-//        element_child.addPositionKeyFrame(new EFPosKeyFrame(88, "100.0,0.0"));
-//        element_child.setParentNode(element_parent);
-//        anim.addElement(KEY_CHILD_ELEMENT, element_child);
-//
-//        //添加并执行动画
-//        EFAnimManager.getInstance().addAnim(KEY_SINGLE_ANIM, anim);
-//
-////        postDelayed(new Runnable() {
-////            @Override
-////            public void run() {
-//        EFAnimManager.getInstance().startAnimByKey(KEY_SINGLE_ANIM);
+        element_parent.addAlphaKeyFrame(new EFAlphaKeyFrame(30, "100.0"));
+        element_parent.addAlphaKeyFrame(new EFAlphaKeyFrame(60, "50.0"));
+        element_parent.addAlphaKeyFrame(new EFAlphaKeyFrame(90, "100.0"));
+        element_parent.addScaleKeyFrame(new EFScaleKeyFrame(30, "100.0,100.0"));
+        element_parent.addScaleKeyFrame(new EFScaleKeyFrame(60, "50.0,50.0"));
+        element_parent.addScaleKeyFrame(new EFScaleKeyFrame(90, "200.0,200.0"));
+        anim.addElement(KEY_PARENT_ELEMENT, element_parent);
+
+        EFElement element_child = new EFElement(mContext, R.mipmap.cucumber, 0, 0);
+        //先设置父子关系，再设置相对坐标，此处相对坐标为参照父组件左上角点
+        element_child.setParentNode(element_parent);
+        element_child.addPositionKeyFrame(new EFPosKeyFrame(1, "0.0,0.0"));
+        element_child.addPositionKeyFrame(new EFPosKeyFrame(44, "100.0,0.0"));
+        element_child.addPositionKeyFrame(new EFPosKeyFrame(88, "0.0,0.0"));
+        element_child.addScaleKeyFrame(new EFScaleKeyFrame(30, "100.0,100.0"));
+        element_child.addScaleKeyFrame(new EFScaleKeyFrame(90, "50.0,50.0"));
+        anim.addElement(KEY_CHILD_ELEMENT, element_child);
+
+        //添加并执行动画
+        EFAnimManager.getInstance().addAnim(KEY_SINGLE_ANIM, anim);
+
+//        postDelayed(new Runnable() {
+//            @Override
+//            public void run() {
+        EFAnimManager.getInstance().startAnimByKey(KEY_SINGLE_ANIM);
 //            }
 //        }, 1000 * 3);
-
     }
 
-
     public void addAnimDemo() {
-        String animDirPath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/red_package/";  //json文件和动画图片所在的文件夹
+        String animDirPath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/yinke_motor/";  //json文件和动画图片所在的文件夹
 //        String animDirPath = mContext.getExternalCacheDir();
-        String jsonPath = animDirPath + "red_package_json.json";
+        String jsonPath = animDirPath + "yinke_motor_json.json";
         String a = JsonUtil.readFile(jsonPath, getContext());
         AnimEntity animEntity;
         animEntity = JsonUtil.jsonTobean(a, AnimEntity.class);
@@ -187,22 +189,20 @@ public class TransparentSurfaceView extends EFSurfaceView {
         anim1.setViewPort(new EFViewPort(1080.0f, 1920.0f));
         EFElement element = null;
         for (AnimEntity.AnimBean.ElementsBean efElement : animEntity.getAnim().getElements()) {
-            if (efElement.getName().equals("red_packet")) {
-                element = new EFElement(mContext, R.mipmap.red_packet, 0, 0);
-            } else if (efElement.getName().equals("m1")) {
-                element = new EFElement(mContext, R.mipmap.m1, 0, 0);
-            } else if (efElement.getName().equals("m2")) {
-                element = new EFElement(mContext, R.mipmap.m2, 0, 0);
-            } else if (efElement.getName().equals("m4")) {
-                element = new EFElement(mContext, R.mipmap.m4, 0, 0);
-
-            } else if (efElement.getName().equals("g1")) {
-                element = new EFElement(mContext, R.mipmap.g1, 0, 0);
-
-            } else if (efElement.getName().equals("g2")) {
-                element = new EFElement(mContext, R.mipmap.g2, 0, 0);
+            if (efElement.getName().equals("motor_body")) {
+                element = new EFElement(mContext, R.mipmap.motor_body, 0, 0);
+            } else if (efElement.getName().equals("motor_inke")) {
+                element = new EFElement(mContext, R.mipmap.motor_inke, 0, 0);
+            } else if (efElement.getName().equals("motor_wheel")) {
+                element = new EFElement(mContext, R.mipmap.motor_wheel, 0, 0);
+            } else if (efElement.getName().equals("motor_shine_back")) {
+                element = new EFElement(mContext, R.mipmap.motor_shine_back, 0, 0);
+            } else if (efElement.getName().equals("motor_shine_front")) {
+                element = new EFElement(mContext, R.mipmap.motor_shine_front, 0, 0);
             }
-
+            if (!TextUtils.isEmpty(efElement.getName())){
+                element.setName(efElement.getName());
+            }
             if (efElement.getPosition() != null) {
                 for (AnimEntity.AnimBean.ElementsBean.PositionBean positionBean : efElement.getPosition()) {
                     element.addPositionKeyFrame(new EFPosKeyFrame(positionBean.getTime(), positionBean.getValue()));
@@ -213,10 +213,7 @@ public class TransparentSurfaceView extends EFSurfaceView {
                 for (AnimEntity.AnimBean.ElementsBean.AlphaBean alphaBean : efElement.getAlpha()) {
                     element.addAlphaKeyFrame(new EFAlphaKeyFrame(alphaBean.getTime(), alphaBean.getValue()));
                 }
-            } else {
-                element.addAlphaKeyFrame(new EFAlphaKeyFrame(1, "100.0"));
             }
-
             if (efElement.getRotation() != null) {
                 for (AnimEntity.AnimBean.ElementsBean.RotationBean rotationBean : efElement.getRotation()) {
                     element.addRotationKeyFrame(new EFRotationKeyFrame(rotationBean.getTime(), rotationBean.getValue()));
@@ -235,8 +232,11 @@ public class TransparentSurfaceView extends EFSurfaceView {
                 }
             }
 
-            anim1.addElement(efElement.getName(), element);
+            if (efElement.getParent() !=null){
+                element.setParentNode(anim1.mElements.get(efElement.getParent()));
+            }
 
+            anim1.addElement(efElement.getName(), element);
         }
         EFAnimManager.getInstance().addAnim(i + "", anim1);
         EFAnimManager.getInstance().startAnimByKey(i + "");

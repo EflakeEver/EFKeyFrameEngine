@@ -73,6 +73,7 @@ public class AnimEntity {
             private List<PathBean> path;
             private List<ScaleBean> scale;
             private List<AlphaBean> alpha;
+            private String parent;
 
             public String getName() {
                 return name;
@@ -80,6 +81,14 @@ public class AnimEntity {
 
             public void setName(String name) {
                 this.name = name;
+            }
+
+            public String getParent() {
+                return parent;
+            }
+
+            public void setParent(String parent) {
+                this.parent = parent;
             }
 
             public List<PositionBean> getPosition() {
