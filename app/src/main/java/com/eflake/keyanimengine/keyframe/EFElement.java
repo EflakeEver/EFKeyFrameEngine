@@ -47,14 +47,14 @@ public class EFElement extends EFSprite implements IEFElement {
     public EFRotationKeyFrame defaultRotationKeyFrame;
     public EFAlphaKeyFrame defaultAlphaKeyFrame;
     public EFAnim mAnim;
-    private float mRealCenterX;
-    private float mRealCenterY;
-    private float mRealStartX;
-    private float mRealStartY;
-    private float mRealRotation;//旋转角度
-    private float mRealAlpha = 100.0f;//不透明度
-    private float mRealScaleX = 1.0f;//缩放比例
-    private float mRealScaleY = 1.0f;//缩放比例
+    public float mRealCenterX;
+    public float mRealCenterY;
+    public float mRealStartX;
+    public float mRealStartY;
+    public float mRealRotation;//旋转角度
+    public float mRealAlpha = 100.0f;//不透明度
+    public float mRealScaleX = 1.0f;//缩放比例
+    public float mRealScaleY = 1.0f;//缩放比例
 
     public EFElement(Context context, String path, int startPosX, int startPosY) {
         super(context, path, startPosX, startPosY);
@@ -76,10 +76,10 @@ public class EFElement extends EFSprite implements IEFElement {
         initDefaultKeyFrame();
     }
 
-    public EFElement(Context context, int resId, float anchorPosX, float anchorPosY, int anchorPointType) {
-        super(context, resId, anchorPosX, anchorPosY, anchorPointType);
-        initDefaultKeyFrame();
-    }
+//    public EFElement(Context context, String path, float anchorPosX, float anchorPosY, EFViewPort viewPort) {
+//        super(context, path, anchorPosX, anchorPosY, viewPort);
+//        initDefaultKeyFrame();
+//    }
 
     public EFElement(Context context, int resId, float startPosX, float startPosY, float width, float height) {
         super(context, resId, startPosX, startPosY, width, height);
@@ -258,13 +258,24 @@ public class EFElement extends EFSprite implements IEFElement {
             initRealValue();
         }
         //转换成对应ViewPort坐标
-        convertViewPortPos();
+//        convertViewPortProperty();
         //根据中心点的绝对坐标，计算左上角点的绝对坐标
         computeRealStartPos();
         //
         convertAlpha();
         //设置应用的变换矩阵
         applyMatrix();
+    }
+
+    private void convertViewPortProperty() {
+        convertViewPortScale();
+        convertViewPortPos();
+    }
+
+    private void convertViewPortScale() {
+        //图片根据ViewPort和ScreenSize比例，做缩放处理，以适配各种分辨率
+        mRealScaleX = mRealScaleX * getAnim().mViewport.getWidthFactor();
+        mRealScaleY = mRealScaleY * getAnim().mViewport.getHeightFactor();
     }
 
     private void convertAlpha() {
@@ -293,8 +304,8 @@ public class EFElement extends EFSprite implements IEFElement {
     }
 
     private void computeRealStartPos() {
-        mRealStartX = mRealCenterX - mWidth / 2;
-        mRealStartY = mRealCenterY - mHeight / 2;
+        mRealStartX = mRealCenterX - mWidth * mRealScaleX / 2;
+        mRealStartY = mRealCenterY - mHeight * mRealScaleY / 2;
     }
 
     private void convertViewPortPos() {
@@ -302,11 +313,14 @@ public class EFElement extends EFSprite implements IEFElement {
         mRealCenterY = convertViewPortPosY(mRealCenterY);
     }
 
-
     private void applyMatrix() {
         mMatrix = getMatrix();
         mMatrix.setTranslate(mRealStartX, mRealStartY);
-        mMatrix.preScale(mRealScaleX, mRealScaleY, mBitmap.getWidth() / 2, mBitmap.getHeight() / 2);
+        if (getParentNode() != null) {
+            mMatrix.preScale(mScaleX, mScaleY, ((EFElement) getParentNode()).mRealCenterX - mRealStartX, ((EFElement) getParentNode()).mRealCenterY - mRealStartY);
+        } else {
+            mMatrix.preScale(mScaleX, mScaleY, mBitmap.getWidth() / 2, mBitmap.getHeight() / 2);
+        }
         mMatrix.preRotate(mRealRotation, mBitmap.getWidth() / 2, mBitmap.getHeight() / 2);
     }
 

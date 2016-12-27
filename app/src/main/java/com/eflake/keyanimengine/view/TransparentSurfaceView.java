@@ -18,10 +18,11 @@ import com.eflake.keyanimengine.keyframe.EFPosKeyFrame;
 import com.eflake.keyanimengine.keyframe.EFRotationKeyFrame;
 import com.eflake.keyanimengine.keyframe.EFScaleKeyFrame;
 import com.eflake.keyanimengine.keyframe.EFViewPort;
-import com.eflake.keyanimengine.main.R;
 import com.eflake.keyanimengine.sprite.EFSprite;
 import com.eflake.keyanimengine.utils.JsonUtil;
 import com.eflake.keyanimengine.utils.LoadImgUtils;
+
+import java.io.File;
 
 public class TransparentSurfaceView extends EFSurfaceView {
 
@@ -117,7 +118,7 @@ public class TransparentSurfaceView extends EFSurfaceView {
 //        element_parent.addPositionKeyFrame(new EFPosKeyFrame(88, "600.0,400.0"));
 //        element_parent.addPositionKeyFrame(new EFPosKeyFrame(128, "600.0,-400.0"));
 //        anim.addElement(KEY_PARENT_ELEMENT, element_parent);
-//
+
 //        EFElement element_child = new EFElement(mContext, R.mipmap.cucumber, 0, 0);
 //        element_child.addPositionKeyFrame(new EFPosKeyFrame(1, "0.0,0.0"));
 //        element_child.addPositionKeyFrame(new EFPosKeyFrame(88, "100.0,0.0"));
@@ -129,24 +130,24 @@ public class TransparentSurfaceView extends EFSurfaceView {
 
 
         //TODO 曲线路径移动
-        EFAnim anim = new EFAnim();
+        /*EFAnim anim = new EFAnim();
         anim.setDuration(1000);
         anim.setViewPort(new EFViewPort(1080.0f, 1920.0f));
         EFElement element_parent = new EFElement(mContext, R.mipmap.mitao, 0, 0);
-//        element_parent.addPositionKeyFrame(new EFPosKeyFrame(1, "200.0,700.0"));
-//        element_parent.addPositionKeyFrame(new EFPosKeyFrame(30, "500.0,700.0"));
-//        element_parent.addPositionKeyFrame(new EFPosKeyFrame(60, "700.0,700.0"));
-//        element_parent.addPositionKeyFrame(new EFPosKeyFrame(90, "1000.0,700.0"));
+        element_parent.addPositionKeyFrame(new EFPosKeyFrame(1, "200.0,700.0"));
+        element_parent.addPositionKeyFrame(new EFPosKeyFrame(30, "500.0,700.0"));
+        element_parent.addPositionKeyFrame(new EFPosKeyFrame(60, "700.0,700.0"));
+        element_parent.addPositionKeyFrame(new EFPosKeyFrame(90, "1000.0,700.0"));
         element_parent.addPathKeyFrame(new EFPathKeyFrame(1, "200.0,700.0", ""));
         element_parent.addPathKeyFrame(new EFPathKeyFrame(30, "500.0,700.0", ""));
         element_parent.addPathKeyFrame(new EFPathKeyFrame(88, "700.0,700.0", ""));
-//        element_parent.addPathKeyFrame(new EFPathKeyFrame(90, "1000.0,700.0", ""));
-//        element_parent.addPathKeyFrame(new EFPathKeyFrame(30, "500.0,700.0", "550.0,300.0,600.0,250.0"));
-//        element_parent.addPathKeyFrame(new EFPathKeyFrame(60, "700.0,700.0", "750.0,300.0,500.0,200.0"));
-//        element_parent.addPathKeyFrame(new EFPathKeyFrame(90, "1000.0,700.0", "950.0,300.0"));
-//        element_parent.addRotationKeyFrame(new EFRotationKeyFrame(30, "0.0"));
-//        element_parent.addRotationKeyFrame(new EFRotationKeyFrame(60, "45.0"));
-//        element_parent.addRotationKeyFrame(new EFRotationKeyFrame(90, "-45.0"));
+        element_parent.addPathKeyFrame(new EFPathKeyFrame(90, "1000.0,700.0", ""));
+        element_parent.addPathKeyFrame(new EFPathKeyFrame(30, "500.0,700.0", "550.0,300.0,600.0,250.0"));
+        element_parent.addPathKeyFrame(new EFPathKeyFrame(60, "700.0,700.0", "750.0,300.0,500.0,200.0"));
+        element_parent.addPathKeyFrame(new EFPathKeyFrame(90, "1000.0,700.0", "950.0,300.0"));
+        element_parent.addRotationKeyFrame(new EFRotationKeyFrame(30, "0.0"));
+        element_parent.addRotationKeyFrame(new EFRotationKeyFrame(60, "45.0"));
+        element_parent.addRotationKeyFrame(new EFRotationKeyFrame(90, "-45.0"));
         element_parent.addAlphaKeyFrame(new EFAlphaKeyFrame(30, "100.0"));
         element_parent.addAlphaKeyFrame(new EFAlphaKeyFrame(60, "50.0"));
         element_parent.addAlphaKeyFrame(new EFAlphaKeyFrame(90, "100.0"));
@@ -166,20 +167,20 @@ public class TransparentSurfaceView extends EFSurfaceView {
         anim.addElement(KEY_CHILD_ELEMENT, element_child);
 
         //添加并执行动画
-        EFAnimManager.getInstance().addAnim(KEY_SINGLE_ANIM, anim);
+        EFAnimManager.getInstance().addAnim(KEY_SINGLE_ANIM, anim);*/
 
 //        postDelayed(new Runnable() {
 //            @Override
 //            public void run() {
-        EFAnimManager.getInstance().startAnimByKey(KEY_SINGLE_ANIM);
+//        EFAnimManager.getInstance().startAnimByKey(KEY_SINGLE_ANIM);
 //            }
 //        }, 1000 * 3);
     }
 
     public void addAnimDemo() {
-        String animDirPath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/yinke_motor/";  //json文件和动画图片所在的文件夹
+        String animDirPath = Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + "yinke_motor";  //json文件和动画图片所在的文件夹
 //        String animDirPath = mContext.getExternalCacheDir();
-        String jsonPath = animDirPath + "yinke_motor_json.json";
+        String jsonPath = animDirPath + File.separator + "yinke_moto_json.json";
         String a = JsonUtil.readFile(jsonPath, getContext());
         AnimEntity animEntity;
         animEntity = JsonUtil.jsonTobean(a, AnimEntity.class);
@@ -189,7 +190,7 @@ public class TransparentSurfaceView extends EFSurfaceView {
         anim1.setViewPort(new EFViewPort(1080.0f, 1920.0f));
         EFElement element = null;
         for (AnimEntity.AnimBean.ElementsBean efElement : animEntity.getAnim().getElements()) {
-            if (efElement.getName().equals("motor_body")) {
+           /* if (efElement.getName().equals("motor_body")) {
                 element = new EFElement(mContext, R.mipmap.motor_body, 0, 0);
             } else if (efElement.getName().equals("motor_inke")) {
                 element = new EFElement(mContext, R.mipmap.motor_inke, 0, 0);
@@ -199,8 +200,11 @@ public class TransparentSurfaceView extends EFSurfaceView {
                 element = new EFElement(mContext, R.mipmap.motor_shine_back, 0, 0);
             } else if (efElement.getName().equals("motor_shine_front")) {
                 element = new EFElement(mContext, R.mipmap.motor_shine_front, 0, 0);
-            }
-            if (!TextUtils.isEmpty(efElement.getName())){
+            } else if (efElement.getName().equals("boat_big_lights")) {
+                element = new EFElement(mContext, R.mipmap.boat_big_lights, 0, 0);
+            }*/
+            element = new EFElement(mContext, animDirPath + File.separator + efElement.getName() + ".png", 0, 0);
+            if (!TextUtils.isEmpty(efElement.getName())) {
                 element.setName(efElement.getName());
             }
             if (efElement.getPosition() != null) {
@@ -232,10 +236,9 @@ public class TransparentSurfaceView extends EFSurfaceView {
                 }
             }
 
-            if (efElement.getParent() !=null){
+            if (efElement.getParent() != null) {
                 element.setParentNode(anim1.mElements.get(efElement.getParent()));
             }
-
             anim1.addElement(efElement.getName(), element);
         }
         EFAnimManager.getInstance().addAnim(i + "", anim1);

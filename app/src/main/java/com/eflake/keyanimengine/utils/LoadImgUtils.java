@@ -54,6 +54,8 @@ public class LoadImgUtils {
         opt.inJustDecodeBounds = true;
         BitmapFactory.decodeResource(context.getResources(), resId, opt);
         opt.inJustDecodeBounds = false;
+//        opt.outWidth = (int) targetWidth;
+//        opt.outHeight = (int) targetHeight;
         opt.inSampleSize = calSampleSize(opt, (int) targetWidth, (int) targetHeight);
         return BitmapFactory.decodeResource(context.getResources(), resId, opt);
     }
@@ -73,6 +75,19 @@ public class LoadImgUtils {
         opt.inPreferredConfig = Config.RGB_565;
         opt.inSampleSize = 1;
         opt.inSampleSize = calSampleSize(opt, (int) targetWidth, (int) targetHeight);
+        return BitmapFactory.decodeFile(imgPath, opt);
+    }
+
+    public static Bitmap ReadFileBitMapWithViewPort(Context context, String imgPath, float widthViewPortFactor, float heightViewPortFactor) {
+        BitmapFactory.Options opt = new BitmapFactory.Options();
+        opt.inJustDecodeBounds = true;
+        BitmapFactory.decodeFile(imgPath, opt);/* 这里返回的bmp是null */
+        opt.inPreferredConfig = Config.RGB_565;
+        opt.outHeight = (int) (opt.outHeight * heightViewPortFactor);
+        opt.outWidth = (int) (opt.outWidth * widthViewPortFactor);
+//        opt.inSampleSize = 1;
+//        opt.inSampleSize = calSampleSize(opt, opt.outWidth, opt.outHeight);
+        opt.inJustDecodeBounds = false;
         return BitmapFactory.decodeFile(imgPath, opt);
     }
 

@@ -1,13 +1,20 @@
 package com.eflake.keyanimengine.main;
 
-import android.support.v7.app.AppCompatActivity;
+import android.Manifest;
+import android.os.Build;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
 
-import com.eflake.keyanimengine.keyframe.EFAnimManager;
 import com.eflake.keyanimengine.utils.ScreenDimenUtils;
 import com.eflake.keyanimengine.view.TransparentSurfaceView;
+import com.karumi.dexter.Dexter;
+import com.karumi.dexter.MultiplePermissionsReport;
+import com.karumi.dexter.PermissionToken;
+import com.karumi.dexter.listener.multi.MultiplePermissionsListener;
+
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -25,7 +32,22 @@ public class MainActivity extends AppCompatActivity {
         bt_start.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                transparentAnimView.addAnimDemo();
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    Dexter.checkPermissions(new MultiplePermissionsListener() {
+                        @Override
+                        public void onPermissionsChecked(MultiplePermissionsReport report) {
+                            transparentAnimView.addAnimDemo();
+                        }
+
+                        @Override
+                        public void onPermissionRationaleShouldBeShown(List<com.karumi.dexter.listener.PermissionRequest> permissions, PermissionToken token) {
+
+                        }
+                    }, Manifest.permission.READ_EXTERNAL_STORAGE, Manifest
+                            .permission.WRITE_EXTERNAL_STORAGE);
+                } else {
+                    transparentAnimView.addAnimDemo();
+                }
             }
         });
 
@@ -36,5 +58,6 @@ public class MainActivity extends AppCompatActivity {
 //                EFAnimManager.getInstance().removeAnimByKey("red");
             }
         });
+
     }
 }

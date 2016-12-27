@@ -24,6 +24,11 @@ public class EFSprite extends EFNode implements IEFSprite {
     /*
     * Path
     * */
+  /*  public EFSprite(Context context, String path, float startPosX, float startPosY, EFViewPort viewPort) {
+        initBitmapWithViewPort(context, path, viewPort);
+        calculateNormalPosAndRect(startPosX, startPosY);
+    }*/
+
     public EFSprite(Context context, String path, float startPosX, float startPosY) {
         initBitmapPath(context, path);
         calculateNormalPosAndRect(startPosX, startPosY);
@@ -35,12 +40,12 @@ public class EFSprite extends EFNode implements IEFSprite {
     }
 
     public EFSprite(Context context, String path, float startPosX, float startPosY, float width, float height) {
-        initBitmapPathWithScale(context, path,width,height);
+        initBitmapPathWithScale(context, path, width, height);
         calculateNormalPosAndRect(startPosX, startPosY);
     }
 
     public EFSprite(Context context, int resId, float startPosX, float startPosY, float width, float height) {
-        initBitmapResWithScale(context,resId,width,height);
+        initBitmapResWithScale(context, resId, width, height);
         calculateNormalPosAndRect(startPosX, startPosY);
     }
 
@@ -54,13 +59,24 @@ public class EFSprite extends EFNode implements IEFSprite {
     }
 
     private void initBitmapPathWithScale(Context context, String path, float width, float height) {
-        mBitmap = LoadImgUtils.ReadFileBitMap(context, path,width,height);
+        mBitmap = LoadImgUtils.ReadFileBitMap(context, path, width, height);
         if (mBitmap != null) {
             mHeight = mBitmap.getHeight();
             mWidth = mBitmap.getWidth();
         }
     }
 
+
+   /* private void initBitmapWithViewPort(Context context, String path, EFViewPort viewPort) {
+        float widthFactor = viewPort.getWidthFactor();
+        float heightFactor = viewPort.getHeightFactor();
+        mBitmap = LoadImgUtils.ReadFileBitMapWithViewPort(context, path, widthFactor, heightFactor);
+        if (mBitmap != null) {
+            mHeight = mBitmap.getHeight();
+            mWidth = mBitmap.getWidth();
+        }
+    }
+*/
     /*
     * Res
     * */
@@ -85,13 +101,12 @@ public class EFSprite extends EFNode implements IEFSprite {
 
 
     private void initBitmapResWithScale(Context context, int resId, float width, float height) {
-        mBitmap = LoadImgUtils.ReadResourceBitMapWithScale(context, resId,width,height);
+        mBitmap = LoadImgUtils.ReadResourceBitMapWithScale(context, resId, width, height);
         if (mBitmap != null) {
             mHeight = mBitmap.getHeight();
             mWidth = mBitmap.getWidth();
         }
     }
-
 
     /*
     * Position

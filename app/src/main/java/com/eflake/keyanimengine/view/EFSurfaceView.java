@@ -118,7 +118,7 @@ public class EFSurfaceView extends EFSurfaceViewBase implements SurfaceHolder.Ca
                 draw();
             }
             long drawTime = (System.currentTimeMillis() - startTime);
-            Log.e("eflake", "draw time = " + drawTime);
+//            Log.e("eflake", "draw time = " + drawTime);
             if (drawTime <= REFRESH_SLEEP_TIME) {
                 mNeedSkipFrame = false;
                 mDeltaTime = REFRESH_SLEEP_TIME - drawTime;
