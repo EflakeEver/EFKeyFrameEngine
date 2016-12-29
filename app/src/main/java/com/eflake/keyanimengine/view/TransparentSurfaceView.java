@@ -180,7 +180,7 @@ public class TransparentSurfaceView extends EFSurfaceView {
     public void addAnimDemo() {
         String animDirPath = Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + "yinke_motor";  //json文件和动画图片所在的文件夹
 //        String animDirPath = mContext.getExternalCacheDir();
-        String jsonPath = animDirPath + File.separator + "yinke_moto_json.json";
+        String jsonPath = animDirPath + File.separator + "yinke_moto_bezier_json.json";
         String a = JsonUtil.readFile(jsonPath, getContext());
         AnimEntity animEntity;
         animEntity = JsonUtil.jsonTobean(a, AnimEntity.class);
@@ -223,6 +223,7 @@ public class TransparentSurfaceView extends EFSurfaceView {
                     element.addRotationKeyFrame(new EFRotationKeyFrame(rotationBean.getTime(), rotationBean.getValue()));
                 }
             }
+
 
             if (efElement.getPath() != null) {
                 for (AnimEntity.AnimBean.ElementsBean.PathBean pathBean : efElement.getPath()) {

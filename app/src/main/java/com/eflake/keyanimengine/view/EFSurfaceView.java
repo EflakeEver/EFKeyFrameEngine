@@ -7,6 +7,9 @@ import android.graphics.Canvas;
 import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Rect;
+import android.os.Handler;
+import android.os.HandlerThread;
+import android.os.Message;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.SurfaceHolder;
@@ -17,7 +20,9 @@ import com.eflake.keyanimengine.utils.LoadImgUtils;
 
 public class EFSurfaceView extends EFSurfaceViewBase implements SurfaceHolder.Callback, Runnable {
 
-    private static final long REFRESH_SLEEP_TIME = 33; //绘制频率,默认为100ms,即1秒绘制10次
+    private static final long REFRESH_SLEEP_TIME = 10; //绘制频率,默认为100ms,即1秒绘制10次
+    private static final int AVERAGE_FRAME_RATE_TIMES = 15;
+    public static final int UPDATE_EVENT = 0;
     protected int mCanvasWidth;
     protected int mCanvasHeight;
     protected Thread animThread;
@@ -31,7 +36,15 @@ public class EFSurfaceView extends EFSurfaceViewBase implements SurfaceHolder.Ca
     public int mPositionY = 100;
     public Matrix mMatrix;
     public Rect mRect;
-    private boolean mNeedSkipFrame;
+    private HandlerThread handlerThread;
+    private Handler mHandler;
+    private long mLastTime;
+    private long mFrameRate;
+    private Paint mTextPaint;
+    private int mFrameRateCount;
+    private String mAverageFrameRate;
+    private long mFraneRateSume;
+    private long mCountTime;
 
     public EFSurfaceView(Context context, int width, int height) {
         this(context);
@@ -72,6 +85,9 @@ public class EFSurfaceView extends EFSurfaceViewBase implements SurfaceHolder.Ca
         mDefaultPaint.setAntiAlias(true);
         mDefaultPaint.setColor(mContext.getResources().getColor(R.color.white));
         mDefaultPaint.setTextSize(mContext.getResources().getDimensionPixelSize(R.dimen.default_txt_size));
+        mTextPaint = new Paint();
+        mTextPaint.setColor(0xff000000);
+        mTextPaint.setTextSize(55);
     }
 
     /*
@@ -80,8 +96,39 @@ public class EFSurfaceView extends EFSurfaceViewBase implements SurfaceHolder.Ca
     @Override
     public void surfaceCreated(SurfaceHolder surfaceHolder) {
         enableKeyFrameAnim();
-        animThread = new Thread(this);
-        animThread.start();
+        handlerThread = new HandlerThread("update");
+        handlerThread.start();
+        mCountTime = System.currentTimeMillis();
+        mHandler = new Handler(handlerThread.getLooper(), new Handler.Callback() {
+            @Override
+            public boolean handleMessage(Message msg) {
+                switch (msg.what) {
+                    case UPDATE_EVENT:
+                        //计算帧率
+                        long frameDuration = System.currentTimeMillis() - mLastTime;
+                        long duration = System.currentTimeMillis() - mCountTime;
+                        mFrameRate = 1000 / frameDuration;
+                        mFrameRateCount++;
+                        mFraneRateSume += mFrameRate;
+                        if (duration >= 1000) {
+                            mCountTime = System.currentTimeMillis();
+                            mAverageFrameRate = String.valueOf(mFraneRateSume / mFrameRateCount);
+                            mFrameRateCount = 0;
+                            mFraneRateSume = 0;
+                        }
+                        mLastTime = System.currentTimeMillis();
+                        draw();
+                        if (isKeyFrameEnable()) {
+                            mHandler.sendEmptyMessageDelayed(0, REFRESH_SLEEP_TIME);
+                        }
+                        break;
+                }
+                return false;
+            }
+        });
+        mHandler.sendEmptyMessage(0);
+//        animThread = new Thread(this);
+//        animThread.start();
     }
 
     @Override
@@ -93,6 +140,7 @@ public class EFSurfaceView extends EFSurfaceViewBase implements SurfaceHolder.Ca
         try {
             mCanvas = mSurfaceHolder.lockCanvas();
             EFScheduler.getInstance().update((int) mDeltaTime, mCanvas, mDefaultPaint);
+            mCanvas.drawText("帧率:" + mAverageFrameRate, 0, 150, mTextPaint);
         } catch (Exception e) {
             Log.d("eflake", e.toString());
         } finally {
@@ -105,6 +153,8 @@ public class EFSurfaceView extends EFSurfaceViewBase implements SurfaceHolder.Ca
     @Override
     public void surfaceDestroyed(SurfaceHolder surfaceHolder) {
         disableKeyFrameAnim();
+        mHandler.removeCallbacksAndMessages("update");
+        handlerThread.quit();
     }
 
     /*
@@ -120,10 +170,8 @@ public class EFSurfaceView extends EFSurfaceViewBase implements SurfaceHolder.Ca
             long drawTime = (System.currentTimeMillis() - startTime);
 //            Log.e("eflake", "draw time = " + drawTime);
             if (drawTime <= REFRESH_SLEEP_TIME) {
-                mNeedSkipFrame = false;
                 mDeltaTime = REFRESH_SLEEP_TIME - drawTime;
             } else {
-                mNeedSkipFrame = true;
                 mDeltaTime = 0;
             }
             try {

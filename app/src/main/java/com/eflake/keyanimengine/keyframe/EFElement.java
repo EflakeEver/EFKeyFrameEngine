@@ -55,6 +55,8 @@ public class EFElement extends EFSprite implements IEFElement {
     public float mRealAlpha = 100.0f;//不透明度
     public float mRealScaleX = 1.0f;//缩放比例
     public float mRealScaleY = 1.0f;//缩放比例
+    private float mLastParentRealScaleX;
+    private float mLastParentRealScaleY;
 
     public EFElement(Context context, String path, int startPosX, int startPosY) {
         super(context, path, startPosX, startPosY);
@@ -257,19 +259,23 @@ public class EFElement extends EFSprite implements IEFElement {
         } else {
             initRealValue();
         }
-        //转换成对应ViewPort坐标
-//        convertViewPortProperty();
         //根据中心点的绝对坐标，计算左上角点的绝对坐标
         computeRealStartPos();
-        //
+        //转换成对应ViewPort坐标
+//        convertViewPortProperty();
         convertAlpha();
         //设置应用的变换矩阵
         applyMatrix();
     }
 
     private void convertViewPortProperty() {
-        convertViewPortScale();
         convertViewPortPos();
+        convertViewPortScale();
+    }
+
+    private void convertViewPortPos() {
+        mRealStartX = convertViewPortPosX(mRealStartX);
+        mRealStartY = convertViewPortPosY(mRealStartY);
     }
 
     private void convertViewPortScale() {
@@ -290,6 +296,11 @@ public class EFElement extends EFSprite implements IEFElement {
         mRealAlpha = convertRelativeToRealAlpha();
         mRealScaleX = convertRelativeToRealScaleX();
         mRealScaleY = convertRelativeToRealScaleY();
+        //由于Scale会影响到子元素相对坐标转换后的绝对坐标，这里需要做补偿计算
+//        mRealCenterX = mRealCenterX + (mLastParentRealScaleX * mWidth / 2 - mRealScaleX * mWidth / 2);
+//        mRealCenterY = mRealCenterY + (mLastParentRealScaleY * mHeight / 2 - mRealScaleY * mHeight / 2);
+//        mLastParentRealScaleX = mRealScaleX;
+//        mLastParentRealScaleY = mRealScaleY;
     }
 
     private void initRealValue() {
@@ -304,22 +315,19 @@ public class EFElement extends EFSprite implements IEFElement {
     }
 
     private void computeRealStartPos() {
-        mRealStartX = mRealCenterX - mWidth * mRealScaleX / 2;
-        mRealStartY = mRealCenterY - mHeight * mRealScaleY / 2;
+        mRealStartX = mRealCenterX - mWidth / 2;
+        mRealStartY = mRealCenterY - mHeight / 2;
     }
 
-    private void convertViewPortPos() {
-        mRealCenterX = convertViewPortPosX(mRealCenterX);
-        mRealCenterY = convertViewPortPosY(mRealCenterY);
-    }
+
 
     private void applyMatrix() {
         mMatrix = getMatrix();
         mMatrix.setTranslate(mRealStartX, mRealStartY);
         if (getParentNode() != null) {
-            mMatrix.preScale(mScaleX, mScaleY, ((EFElement) getParentNode()).mRealCenterX - mRealStartX, ((EFElement) getParentNode()).mRealCenterY - mRealStartY);
+            mMatrix.preScale(mRealScaleX, mRealScaleY, ((EFElement) getParentNode()).mRealCenterX - mRealStartX, ((EFElement) getParentNode()).mRealCenterY - mRealStartY);
         } else {
-            mMatrix.preScale(mScaleX, mScaleY, mBitmap.getWidth() / 2, mBitmap.getHeight() / 2);
+            mMatrix.preScale(mRealScaleX, mRealScaleY, mBitmap.getWidth() / 2, mBitmap.getHeight() / 2);
         }
         mMatrix.preRotate(mRealRotation, mBitmap.getWidth() / 2, mBitmap.getHeight() / 2);
     }

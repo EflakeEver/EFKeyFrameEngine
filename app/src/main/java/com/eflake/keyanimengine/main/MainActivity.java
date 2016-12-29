@@ -1,9 +1,12 @@
 package com.eflake.keyanimengine.main;
 
 import android.Manifest;
+import android.annotation.TargetApi;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
+import android.view.Choreographer;
 import android.view.View;
 import android.widget.Button;
 
@@ -20,6 +23,7 @@ public class MainActivity extends AppCompatActivity {
 
     private TransparentSurfaceView transparentAnimView;
 
+    @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -56,6 +60,13 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
 //                transparentAnimView.getAnimDemo().setIsRunning(false);
 //                EFAnimManager.getInstance().removeAnimByKey("red");
+            }
+        });
+
+        Choreographer.getInstance().postFrameCallback(new Choreographer.FrameCallback() {
+            @Override
+            public void doFrame(long frameTimeNanos) {
+                Log.e("***","doframe");
             }
         });
 
