@@ -224,7 +224,6 @@ public class TransparentSurfaceView extends EFSurfaceView {
                 }
             }
 
-
             if (efElement.getPath() != null) {
                 for (AnimEntity.AnimBean.ElementsBean.PathBean pathBean : efElement.getPath()) {
                     element.addPathKeyFrame(new EFPathKeyFrame(pathBean.getTime(), pathBean.getValue(), pathBean.getControl()));
@@ -242,8 +241,9 @@ public class TransparentSurfaceView extends EFSurfaceView {
             }
             anim1.addElement(efElement.getName(), element);
         }
+        anim1.setIsRunning(true);
         EFAnimManager.getInstance().addAnim(i + "", anim1);
-        EFAnimManager.getInstance().startAnimByKey(i + "");
+//        EFAnimManager.getInstance().startAnimByKey(i + "");
         i++;
     }
 

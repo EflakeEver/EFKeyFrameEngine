@@ -55,8 +55,8 @@ public class EFElement extends EFSprite implements IEFElement {
     public float mRealAlpha = 100.0f;//不透明度
     public float mRealScaleX = 1.0f;//缩放比例
     public float mRealScaleY = 1.0f;//缩放比例
-    private float mLastParentRealScaleX;
-    private float mLastParentRealScaleY;
+    private float mViewPortScaleX = 1.0f;
+    private float mViewPortScaleY = 1.0f;
 
     public EFElement(Context context, String path, int startPosX, int startPosY) {
         super(context, path, startPosX, startPosY);
@@ -259,10 +259,9 @@ public class EFElement extends EFSprite implements IEFElement {
         } else {
             initRealValue();
         }
-        //根据中心点的绝对坐标，计算左上角点的绝对坐标
-        computeRealStartPos();
         //转换成对应ViewPort坐标
-//        convertViewPortProperty();
+        convertViewPortProperty();
+        //转换成真实Alpha
         convertAlpha();
         //设置应用的变换矩阵
         applyMatrix();
@@ -274,14 +273,19 @@ public class EFElement extends EFSprite implements IEFElement {
     }
 
     private void convertViewPortPos() {
-        mRealStartX = convertViewPortPosX(mRealStartX);
-        mRealStartY = convertViewPortPosY(mRealStartY);
+        //Viewport坐标计算是正确的
+        mRealCenterX = convertViewPortPosX(mRealCenterX);
+        mRealCenterY = convertViewPortPosY(mRealCenterY);
+        mRealStartX = mRealCenterX - mWidth / 2.0f;
+        mRealStartY = mRealCenterY - mHeight / 2.0f;
     }
 
     private void convertViewPortScale() {
         //图片根据ViewPort和ScreenSize比例，做缩放处理，以适配各种分辨率
-        mRealScaleX = mRealScaleX * getAnim().mViewport.getWidthFactor();
-        mRealScaleY = mRealScaleY * getAnim().mViewport.getHeightFactor();
+        //TODO 目前仅仅是按屏幕比例对图片做同比缩放，并不能保证图片不被拉伸（因为考虑到父子关系坐标问题），后续需要解决这个问题
+        //此处需要注意，如果包含父子关系，子节点的ViewPort Scale，必须基于自身中心位置做缩放，才能保证最终计算结果准确
+        mViewPortScaleX = getAnim().mViewport.getWidthFactor();
+        mViewPortScaleY = getAnim().mViewport.getHeightFactor();
     }
 
     private void convertAlpha() {
@@ -292,15 +296,12 @@ public class EFElement extends EFSprite implements IEFElement {
         //转换相对坐标为绝对坐标
         mRealCenterX = convertRelativeToRealPosX();
         mRealCenterY = convertRelativeToRealPosY();
-        mRealRotation = convertRelativeToRealRotation();
-        mRealAlpha = convertRelativeToRealAlpha();
-        mRealScaleX = convertRelativeToRealScaleX();
-        mRealScaleY = convertRelativeToRealScaleY();
-        //由于Scale会影响到子元素相对坐标转换后的绝对坐标，这里需要做补偿计算
-//        mRealCenterX = mRealCenterX + (mLastParentRealScaleX * mWidth / 2 - mRealScaleX * mWidth / 2);
-//        mRealCenterY = mRealCenterY + (mLastParentRealScaleY * mHeight / 2 - mRealScaleY * mHeight / 2);
-//        mLastParentRealScaleX = mRealScaleX;
-//        mLastParentRealScaleY = mRealScaleY;
+        mRealStartX = mRealCenterX - mWidth / 2.0f;
+        mRealStartY = mRealCenterY - mHeight / 2.0f;
+        mRealRotation = mRotation;
+        mRealAlpha = mAlpha;
+        mRealScaleX = mScaleX;
+        mRealScaleY = mScaleY;
     }
 
     private void initRealValue() {
@@ -314,22 +315,39 @@ public class EFElement extends EFSprite implements IEFElement {
         mRealScaleY = mScaleY;
     }
 
-    private void computeRealStartPos() {
-        mRealStartX = mRealCenterX - mWidth / 2;
-        mRealStartY = mRealCenterY - mHeight / 2;
-    }
-
-
-
     private void applyMatrix() {
         mMatrix = getMatrix();
+        //设置位移矩阵
         mMatrix.setTranslate(mRealStartX, mRealStartY);
+        //设置缩放矩阵
+        //缩放矩阵包含三种情况，自身缩放，父组件缩放及ViewPort缩放
+        //父组件缩放
         if (getParentNode() != null) {
-            mMatrix.preScale(mRealScaleX, mRealScaleY, ((EFElement) getParentNode()).mRealCenterX - mRealStartX, ((EFElement) getParentNode()).mRealCenterY - mRealStartY);
-        } else {
-            mMatrix.preScale(mRealScaleX, mRealScaleY, mBitmap.getWidth() / 2, mBitmap.getHeight() / 2);
+            float parentScaleX = ((EFElement) getParentNode()).mRealScaleX;
+            float parentScaleY = ((EFElement) getParentNode()).mRealScaleY;
+            if (parentScaleX != 1.0f || parentScaleY != 1.0f) {
+                //父组件的Scale，需要针对父组件自身中心位置进行缩放
+                mMatrix.preScale(parentScaleX, parentScaleY, ((EFElement) getParentNode()).mRealCenterX - mRealStartX, ((EFElement) getParentNode()).mRealCenterY - mRealStartY);
+            }
         }
-        mMatrix.preRotate(mRealRotation, mBitmap.getWidth() / 2, mBitmap.getHeight() / 2);
+        //ViewPort缩放 & 自身缩放
+        if (mViewPortScaleX != 1.0f || mViewPortScaleY != 1.0f) {
+            mMatrix.preScale(mViewPortScaleX * mRealScaleX, mViewPortScaleY * mRealScaleY, mBitmap.getWidth() / 2.0f, mBitmap.getHeight() / 2.0f);
+        } else {
+            mMatrix.preScale(mRealScaleX, mRealScaleY, mBitmap.getWidth() / 2.0f, mBitmap.getHeight() / 2.0f);
+        }
+        //设置旋转矩阵
+        //旋转矩阵包括两种情况，自身旋转，父组件旋转
+        //父组件旋转
+        if (getParentNode() != null) {
+            float parentRotation = ((EFElement) getParentNode()).mRealRotation;
+            if (parentRotation != 0.0f) {
+                //父组件的Scale，需要针对父组件自身中心位置进行缩放
+                mMatrix.preRotate(parentRotation, ((EFElement) getParentNode()).mRealCenterX - mRealStartX, ((EFElement) getParentNode()).mRealCenterY - mRealStartY);
+            }
+        }
+        //自身旋转
+        mMatrix.preRotate(mRealRotation, mBitmap.getWidth() / 2.0f, mBitmap.getHeight() / 2.0f);
     }
 
     private int judgeFrameArea(int type, long currentAnimFrameIndex) {
@@ -604,7 +622,9 @@ public class EFElement extends EFSprite implements IEFElement {
     public void draw(Canvas canvas, Paint defaultPaint) {
         //TODO 不同的元素，应采用不同画笔
         defaultPaint.setAlpha((int) mRealAlpha);
-        canvas.drawBitmap(mBitmap, mMatrix, defaultPaint);
+        if (canvas != null) {
+            canvas.drawBitmap(mBitmap, mMatrix, defaultPaint);
+        }
     }
 
 

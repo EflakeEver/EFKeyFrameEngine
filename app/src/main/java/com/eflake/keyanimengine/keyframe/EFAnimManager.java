@@ -5,15 +5,18 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.util.Log;
 
+import com.eflake.keyanimengine.scheduler.EFSchedulerChange;
 import com.eflake.keyanimengine.scheduler.IEFUpdate;
 
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.Map;
 
 public class EFAnimManager implements IEFAnimManager, IEFUpdate {
 
     public HashMap<String, EFAnim> mAnims = new HashMap<>();//所有已加载的动画
+    private LinkedList<EFAnimChange> animChanges = new LinkedList<>();
     private boolean mIsPaused;//是否暂停所有动画
 
     private EFAnimManager() {
@@ -30,32 +33,49 @@ public class EFAnimManager implements IEFAnimManager, IEFUpdate {
 
     @Override
     public boolean addAnim(String key, EFAnim anim) {
-        if (!mAnims.containsKey(key) && anim != null) {
-            mAnims.put(key, anim);
-            return true;
-        } else {
-            return false;
-        }
+
+        EFAnimChange change = new EFAnimChange();
+        change.setKey(key);
+        change.setType(EFAnimChange.TYPE_ADD);
+        change.setAnim(anim);
+        animChanges.add(change);
+        //TODO
+        return true;
+
+//        if (!mAnims.containsKey(key) && anim != null) {
+//            mAnims.put(key, anim);
+//            return true;
+//        } else {
+//            return false;
+//        }
     }
 
     @Override
     public boolean removeAnimByKey(String key) {
-        if (mAnims.containsKey(key)) {
-            Iterator<Map.Entry<String, EFElement>> iterator = mAnims.get(key).mElements.entrySet().iterator();
-            if (iterator.hasNext()) {
-                Map.Entry<String, EFElement> entry = iterator.next();
-                if (!entry.getValue().mBitmap.isRecycled() && entry.getValue().mBitmap != null) {
-                    Log.d("zxy", "bitmap_recycle");
-                    entry.getValue().mBitmap.recycle();
-                    entry.getValue().mBitmap = null;
-                }
-            }
-            System.gc();
-            mAnims.remove(key);
-            return true;
-        } else {
-            return false;
-        }
+        EFAnimChange change = new EFAnimChange();
+        change.setKey(key);
+        change.setType(EFAnimChange.TYPE_REMOVE);
+        change.setAnim(null);
+        animChanges.add(change);
+        //TODO
+        return true;
+
+//        if (mAnims.containsKey(key)) {
+//            Iterator<Map.Entry<String, EFElement>> iterator = mAnims.get(key).mElements.entrySet().iterator();
+//            if (iterator.hasNext()) {
+//                Map.Entry<String, EFElement> entry = iterator.next();
+//                if (!entry.getValue().mBitmap.isRecycled() && entry.getValue().mBitmap != null) {
+//                    Log.d("zxy", "bitmap_recycle");
+//                    entry.getValue().mBitmap.recycle();
+//                    entry.getValue().mBitmap = null;
+//                }
+//            }
+//            System.gc();
+//            mAnims.remove(key);
+//            return true;
+//        } else {
+//            return false;
+//        }
     }
 
     @Override
@@ -106,6 +126,37 @@ public class EFAnimManager implements IEFAnimManager, IEFUpdate {
             if (currentAnim.isRunning()) {
                 currentAnim.draw(canvas, defaultPaint);
             }
+        }
+        applyAnimChange();
+    }
+
+    private void applyAnimChange() {
+        if (animChanges.size() > 0) {
+            for (int i = 0; i < animChanges.size(); i++) {
+                EFAnimChange change = animChanges.get(i);
+                int type = change.getType();
+                EFAnim anim = change.getAnim();
+                String key = change.getKey();
+                if (type == EFSchedulerChange.TYPE_ADD) {
+                    if (!mAnims.containsKey(key)) {
+                        mAnims.put(key, anim);
+                    }
+                } else if (type == EFSchedulerChange.TYPE_REMOVE) {
+                    if (mAnims.containsKey(key)) {
+                        Iterator<Map.Entry<String, EFElement>> iterator = mAnims.get(key).mElements.entrySet().iterator();
+                        if (iterator.hasNext()) {
+                            Map.Entry<String, EFElement> entry = iterator.next();
+                            if (!entry.getValue().mBitmap.isRecycled() && entry.getValue().mBitmap != null) {
+                                Log.d("zxy", "bitmap_recycle");
+                                entry.getValue().mBitmap.recycle();
+                                entry.getValue().mBitmap = null;
+                            }
+                        }
+                        mAnims.remove(key);
+                    }
+                }
+            }
+            animChanges.clear();
         }
     }
 

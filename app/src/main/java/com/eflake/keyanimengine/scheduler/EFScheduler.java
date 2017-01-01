@@ -10,6 +10,7 @@ import com.eflake.keyanimengine.keyframe.EFAnimManager;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.Map;
 
 /*
@@ -19,6 +20,7 @@ public class EFScheduler implements IEFScheduler {
 
     public static final String TAG = EFScheduler.class.getSimpleName();
     private HashMap<String, IEFUpdate> observers = new LinkedHashMap<>();
+    private LinkedList<EFSchedulerChange> observerChanges = new LinkedList<>();
 
     private EFScheduler() {
     }
@@ -44,11 +46,17 @@ public class EFScheduler implements IEFScheduler {
             return false;
         }
 
-        if (observers.containsKey(observer)) {
-            return false;
-        }
+        EFSchedulerChange change = new EFSchedulerChange();
+        change.setIEFUpdate(observer);
+        change.setType(EFSchedulerChange.TYPE_ADD);
+        change.setKey(String.valueOf(observer.hashCode()));
+        observerChanges.add(change);
 
-        observers.put(observer.hashCode() + "", observer);
+//        if (observers.containsKey(observer)) {
+//            return false;
+//        }
+//
+//        observers.put(observer.hashCode() + "", observer);
 
         return true;
     }
@@ -59,11 +67,17 @@ public class EFScheduler implements IEFScheduler {
             return false;
         }
 
-        if (!observers.containsKey(observer)) {
-            return false;
-        }
+        EFSchedulerChange change = new EFSchedulerChange();
+        change.setIEFUpdate(observer);
+        change.setType(EFSchedulerChange.TYPE_REMOVE);
+        change.setKey(String.valueOf(observer.hashCode()));
+        observerChanges.add(change);
 
-        observers.remove(observer.hashCode());
+//        if (!observers.containsKey(observer)) {
+//            return false;
+//        }
+//
+//        observers.remove(observer.hashCode());
         return true;
     }
 
@@ -73,7 +87,6 @@ public class EFScheduler implements IEFScheduler {
     public void update(int deltaTime, Canvas canvas, Paint defaultPaint) {
         long oldUpdateTime = System.currentTimeMillis();
         Iterator updateIterator = observers.entrySet().iterator();
-        //TODO 如果耗时过长,需要把这个时间也考虑加进入deltaTime中
         while (updateIterator.hasNext()) {
             Map.Entry<String, IEFUpdate> entry = (Map.Entry<String, IEFUpdate>) updateIterator.next();
             String key = entry.getKey();
@@ -97,7 +110,31 @@ public class EFScheduler implements IEFScheduler {
                 observer.draw(canvas, defaultPaint);
             }
         }
+
+        applyObserverChange();
 //        Log.e(TAG, "draw cost time = " + String.valueOf(System.currentTimeMillis() - oldUpdateTime));
     }
-    
+
+    private void applyObserverChange() {
+        if (observerChanges.size() > 0) {
+            for (int i = 0; i < observerChanges.size(); i++) {
+                EFSchedulerChange change = observerChanges.get(i);
+                int type = change.getType();
+                IEFUpdate observer = change.getIEFUpdate();
+                String key = change.getKey();
+                if (type == EFSchedulerChange.TYPE_ADD) {
+                    if (!observers.containsKey(key)) {
+                        observers.put(key, observer);
+                    }
+                } else if (type == EFSchedulerChange.TYPE_REMOVE) {
+                    if (observers.containsKey(key)) {
+                        observers.remove(key);
+                    }
+                }
+            }
+            observerChanges.clear();
+        }
+    }
+
+
 }
