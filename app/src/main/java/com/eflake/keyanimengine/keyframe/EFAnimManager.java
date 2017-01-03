@@ -90,6 +90,8 @@ public class EFAnimManager implements IEFAnimManager, IEFUpdate {
             //检查动画是否已经完成,如果完成,则从Map中移除
             if (currentAnim.isDone()) {
                 currentAnim.setIsRunning(false);
+                //TODO 调用顺序问题
+                currentAnim.onAnimDone();
                 removeAnimByKey(entry.getKey());
             }
             //如果动画正在进行,则调用step方法

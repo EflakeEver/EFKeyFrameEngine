@@ -29,6 +29,10 @@ public interface IEFAnim {
 
     void setName(String name);
 
+    void setEndListener(IEFAnimEndListener listener);
+
+    void removeEndListener();
+
     String getName();
 
     void draw(Canvas canvas, Paint defaultPaint);

@@ -18,6 +18,7 @@ public class EFAnim implements IEFAnim {
     public EFViewPort mViewport;//显示的ViewPort
     private boolean mIsRunning;//动画是否正在执行
     public HashMap<String, EFElement> mElements = new LinkedHashMap<>();//子元素
+    public IEFAnimEndListener mIEFAnimEndListener;
 
     @Override
     public void setDuration(long duration) {
@@ -93,6 +94,18 @@ public class EFAnim implements IEFAnim {
     }
 
     @Override
+    public void setEndListener(IEFAnimEndListener listener) {
+        this.mIEFAnimEndListener = listener;
+    }
+
+    @Override
+    public void removeEndListener() {
+        if (mIEFAnimEndListener != null) {
+            mIEFAnimEndListener = null;
+        }
+    }
+
+    @Override
     public String getName() {
         return mName;
     }
@@ -105,4 +118,13 @@ public class EFAnim implements IEFAnim {
             entry.getValue().draw(canvas, defaultPaint);
         }
     }
+
+    public void onAnimDone() {
+        if (mIEFAnimEndListener != null) {
+            mIEFAnimEndListener.onAnimEnd();
+            removeEndListener();
+        }
+    }
+
+
 }
