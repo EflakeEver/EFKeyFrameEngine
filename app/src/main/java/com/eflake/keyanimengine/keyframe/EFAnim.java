@@ -12,13 +12,12 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class EFAnim implements IEFAnim {
-    public long mDurationFrame;//总帧数
-    public HashMap<String, EFElement> mElements = new LinkedHashMap<>();//子元素
-    public String mName;//动画名称
-    public long mElapsedFrame;//动画已运行帧数
+    private long mDurationFrame;//总帧数
+    private String mName;//动画名称
+    private long mElapsedFrame;//动画已运行帧数
     public EFViewPort mViewport;//显示的ViewPort
-    public boolean mIsRunning;//动画是否正在执行
-    public boolean mIsAnimStartFrame;
+    private boolean mIsRunning;//动画是否正在执行
+    public HashMap<String, EFElement> mElements = new LinkedHashMap<>();//子元素
 
     @Override
     public void setDuration(long duration) {

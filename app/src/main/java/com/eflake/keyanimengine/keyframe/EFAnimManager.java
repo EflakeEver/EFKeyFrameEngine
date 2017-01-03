@@ -3,7 +3,6 @@ package com.eflake.keyanimengine.keyframe;
 
 import android.graphics.Canvas;
 import android.graphics.Paint;
-import android.util.Log;
 
 import com.eflake.keyanimengine.scheduler.EFSchedulerChange;
 import com.eflake.keyanimengine.scheduler.IEFUpdate;
@@ -32,50 +31,21 @@ public class EFAnimManager implements IEFAnimManager, IEFUpdate {
     }
 
     @Override
-    public boolean addAnim(String key, EFAnim anim) {
-
+    public void addAnim(String key, EFAnim anim) {
         EFAnimChange change = new EFAnimChange();
         change.setKey(key);
         change.setType(EFAnimChange.TYPE_ADD);
         change.setAnim(anim);
         animChanges.add(change);
-        //TODO
-        return true;
-
-//        if (!mAnims.containsKey(key) && anim != null) {
-//            mAnims.put(key, anim);
-//            return true;
-//        } else {
-//            return false;
-//        }
     }
 
     @Override
-    public boolean removeAnimByKey(String key) {
+    public void removeAnimByKey(String key) {
         EFAnimChange change = new EFAnimChange();
         change.setKey(key);
         change.setType(EFAnimChange.TYPE_REMOVE);
         change.setAnim(null);
         animChanges.add(change);
-        //TODO
-        return true;
-
-//        if (mAnims.containsKey(key)) {
-//            Iterator<Map.Entry<String, EFElement>> iterator = mAnims.get(key).mElements.entrySet().iterator();
-//            if (iterator.hasNext()) {
-//                Map.Entry<String, EFElement> entry = iterator.next();
-//                if (!entry.getValue().mBitmap.isRecycled() && entry.getValue().mBitmap != null) {
-//                    Log.d("zxy", "bitmap_recycle");
-//                    entry.getValue().mBitmap.recycle();
-//                    entry.getValue().mBitmap = null;
-//                }
-//            }
-//            System.gc();
-//            mAnims.remove(key);
-//            return true;
-//        } else {
-//            return false;
-//        }
     }
 
     @Override
@@ -147,7 +117,6 @@ public class EFAnimManager implements IEFAnimManager, IEFUpdate {
                         if (iterator.hasNext()) {
                             Map.Entry<String, EFElement> entry = iterator.next();
                             if (!entry.getValue().mBitmap.isRecycled() && entry.getValue().mBitmap != null) {
-                                Log.d("zxy", "bitmap_recycle");
                                 entry.getValue().mBitmap.recycle();
                                 entry.getValue().mBitmap = null;
                             }

@@ -7,6 +7,9 @@ import android.view.SurfaceView;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
+/*
+* 抽象基类，包含整个SurfaceView动画刷新开关
+* */
 public abstract class EFSurfaceViewBase extends SurfaceView {
     private AtomicBoolean isRunning = new AtomicBoolean(true);
 
@@ -22,15 +25,15 @@ public abstract class EFSurfaceViewBase extends SurfaceView {
         super(context, attrs, defStyleAttr);
     }
 
-    public void enableKeyFrameAnim() {
+    public void enableAnim() {
         isRunning.compareAndSet(false, true);
     }
 
-    public void disableKeyFrameAnim() {
+    public void disableAnim() {
         isRunning.compareAndSet(true, false);
     }
 
-    public boolean isKeyFrameEnable() {
+    public boolean isAnimEnable() {
         return isRunning.get();
     }
 

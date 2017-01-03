@@ -2,9 +2,9 @@ package com.eflake.keyanimengine.keyframe;
 
 
 public interface IEFAnimManager {
-    boolean addAnim(String key, EFAnim anim);
+    void addAnim(String key, EFAnim anim);
 
-    boolean removeAnimByKey(String key);
+    void removeAnimByKey(String key);
 
     void removeAllAnim();
 

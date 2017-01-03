@@ -5,8 +5,6 @@ import android.annotation.TargetApi;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
-import android.view.Choreographer;
 import android.view.View;
 import android.widget.Button;
 
@@ -15,6 +13,7 @@ import com.eflake.keyanimengine.view.TransparentSurfaceView;
 import com.karumi.dexter.Dexter;
 import com.karumi.dexter.MultiplePermissionsReport;
 import com.karumi.dexter.PermissionToken;
+import com.karumi.dexter.listener.PermissionRequest;
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener;
 
 import java.util.List;
@@ -22,6 +21,7 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity {
 
     private TransparentSurfaceView transparentAnimView;
+    private boolean mPermissionGranted;
 
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
     @Override
@@ -29,46 +29,42 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setTheme(R.style.Real_Splash);
         setContentView(R.layout.activity_main);
+        //获取屏幕参数
         ScreenDimenUtils.init(this);
+        initWidget();
+        //Android 5.0以上，需要获取SD卡读写权限
+        getPermission();
+    }
+
+    private void initWidget() {
         transparentAnimView = (TransparentSurfaceView) findViewById(R.id.transparentAnimView);
         Button bt_start = (Button) findViewById(R.id.bt_start);
-        Button bt_end = (Button) findViewById(R.id.bt_end);
         bt_start.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                    Dexter.checkPermissions(new MultiplePermissionsListener() {
-                        @Override
-                        public void onPermissionsChecked(MultiplePermissionsReport report) {
-                            transparentAnimView.addAnimDemo();
-                        }
-
-                        @Override
-                        public void onPermissionRationaleShouldBeShown(List<com.karumi.dexter.listener.PermissionRequest> permissions, PermissionToken token) {
-
-                        }
-                    }, Manifest.permission.READ_EXTERNAL_STORAGE, Manifest
-                            .permission.WRITE_EXTERNAL_STORAGE);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && mPermissionGranted) {
+                    transparentAnimView.addAnimDemo();
                 } else {
                     transparentAnimView.addAnimDemo();
                 }
             }
         });
+    }
 
-        bt_end.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-//                transparentAnimView.getAnimDemo().setIsRunning(false);
-//                EFAnimManager.getInstance().removeAnimByKey("red");
-            }
-        });
+    private void getPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            Dexter.checkPermissions(new MultiplePermissionsListener() {
+                @Override
+                public void onPermissionsChecked(MultiplePermissionsReport report) {
+                    mPermissionGranted = true;
+                }
 
-        Choreographer.getInstance().postFrameCallback(new Choreographer.FrameCallback() {
-            @Override
-            public void doFrame(long frameTimeNanos) {
-                Log.e("***","doframe");
-            }
-        });
+                @Override
+                public void onPermissionRationaleShouldBeShown(List<PermissionRequest> permissions, PermissionToken token) {
 
+                }
+            }, Manifest.permission.READ_EXTERNAL_STORAGE, Manifest
+                    .permission.WRITE_EXTERNAL_STORAGE);
+        }
     }
 }

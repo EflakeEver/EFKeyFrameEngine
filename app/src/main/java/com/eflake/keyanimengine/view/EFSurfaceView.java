@@ -2,11 +2,8 @@ package com.eflake.keyanimengine.view;
 
 
 import android.content.Context;
-import android.graphics.Bitmap;
 import android.graphics.Canvas;
-import android.graphics.Matrix;
 import android.graphics.Paint;
-import android.graphics.Rect;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Message;
@@ -16,37 +13,43 @@ import android.view.SurfaceHolder;
 
 import com.eflake.keyanimengine.main.R;
 import com.eflake.keyanimengine.scheduler.EFScheduler;
-import com.eflake.keyanimengine.utils.LoadImgUtils;
 
+/*
+* 核心基类，处理非UI线程刷新相关原始事件
+* */
 public class EFSurfaceView extends EFSurfaceViewBase implements SurfaceHolder.Callback {
-
-    private static final long REFRESH_SLEEP_TIME = 10; //绘制频率
-    public static final int UPDATE_EVENT = 0;
-    public static final String UPDATE_THREAD_NAME = "update";
+    private static final String LOG_TAG = EFSurfaceView.class.getSimpleName();
+    public static final int CAL_SAMPLE_TIME = 10;
+    //update thread相关
+    private HandlerThread updateThread;
+    private Handler updateThreadHandler;
+    public static final String UPDATE_THREAD_NAME = "update_thread";
+    public static final int UPDATE_EVENT = 0;//更新事件
+    private static final long REFRESH_SLEEP_TIME = 10; //更新频率
+    //canvas相关
     protected int mCanvasWidth;
     protected int mCanvasHeight;
-    protected Thread animThread;
     protected SurfaceHolder mSurfaceHolder;
     protected Canvas mCanvas;
-    protected Context mContext;
     private Paint mDefaultPaint;
-    private long mDeltaTime = REFRESH_SLEEP_TIME;
-    public Bitmap mBitmap;
-    public int mPositionX = 100;
-    public int mPositionY = 100;
-    public Matrix mMatrix;
-    public Rect mRect;
-    private HandlerThread handlerThread;
-    private Handler mHandler;
-    private long mLastTime;
-    private long mFrameRate;
     private Paint mTextPaint;
-    private int mFrameRateCount;
-    private String mAverageFrameRate = "";
-    private long mFrameRateSum;
-    private long mCountTime;
+    //anim thread相关
+    protected Thread animThread;
     public final Object lockObj = new Object();
-    private long mDrawTime;
+    //计算相关
+    private String mAverageCanvasUnlockFrameRate;//Canvas绘制帧率
+    private String mCanvasWaitTime;//线程等待时间
+    private String mCanvasDrawTime;//绘制计算时间
+    private long mLastCanvasUnlockTime;
+    private long mLastCanvasUnlockCalTime;
+    private int mCanvasUnlockRateCount;
+    private long mCanvasUnlockRateSum;
+    private int mCanvasDrawTimeCount;
+    private long mCanvasDrawSum;
+    private int mCanvasWaitTimeCount;
+    private long mCanvasWaitSum;
+    protected Context mContext;
+    private long mLastDeltaTime;
 
     public EFSurfaceView(Context context, int width, int height) {
         this(context);
@@ -74,15 +77,11 @@ public class EFSurfaceView extends EFSurfaceViewBase implements SurfaceHolder.Ca
         mContext = context;
         mSurfaceHolder = getHolder();
         mSurfaceHolder.addCallback(this);
-        mBitmap = LoadImgUtils.ReadResourceBitMap(mContext, R.mipmap.red_packet);
-        mMatrix = new Matrix();
-        mRect = new Rect(mPositionX, mPositionY, mBitmap.getWidth(), mBitmap.getHeight());
-        initDefaultPaint();
+        initPaint();
         initSurfaceHolder(mSurfaceHolder);
-        initSprite();
     }
 
-    private void initDefaultPaint() {
+    private void initPaint() {
         mDefaultPaint = new Paint();
         mDefaultPaint.setAntiAlias(true);
         mDefaultPaint.setColor(mContext.getResources().getColor(R.color.white));
@@ -93,56 +92,46 @@ public class EFSurfaceView extends EFSurfaceViewBase implements SurfaceHolder.Ca
     }
 
     /*
-    * SurfaceHolder生命周期回调方法
+    * SurfaceHolder生命周期
     * */
     @Override
     public void surfaceCreated(SurfaceHolder surfaceHolder) {
-        enableKeyFrameAnim();
-        handlerThread = new HandlerThread(UPDATE_THREAD_NAME);
-        handlerThread.start();
-        mCountTime = System.currentTimeMillis();
-        mHandler = new Handler(handlerThread.getLooper(), new Handler.Callback() {
+        enableAnim();
+        initUpdateThread();
+        initAnimThread();
+    }
+
+    private void initUpdateThread() {
+        updateThread = new HandlerThread(UPDATE_THREAD_NAME);
+        updateThread.start();
+        updateThreadHandler = new Handler(updateThread.getLooper(), new Handler.Callback() {
             @Override
             public boolean handleMessage(Message msg) {
                 switch (msg.what) {
                     case UPDATE_EVENT:
-                        long frameDuration = System.currentTimeMillis() - mLastTime;
-                        long duration = System.currentTimeMillis() - mCountTime;
-//                        Log.e("@@@", "frame duration = " + frameDuration);
-                        mLastTime = System.currentTimeMillis();
-                        constantUpdate(frameDuration);
-                        if (isKeyFrameEnable()) {
-                            mHandler.sendEmptyMessageDelayed(0, REFRESH_SLEEP_TIME);
-                        }
-                        //帧率update平均计算
-                        mFrameRate = 1000 / frameDuration;
-                        mFrameRateCount++;
-                        mFrameRateSum += mFrameRate;
-                        if (duration >= 1000) {
-                            mCountTime = System.currentTimeMillis();
-                            mAverageFrameRate = String.valueOf(mFrameRateSum / mFrameRateCount);
-                            mFrameRateCount = 0;
-                            mFrameRateSum = 0;
+//                        long frameDuration = System.currentTimeMillis() - mLastTime;
+//                        Log.e(LOG_TAG, "update frequency = " + frameDuration);
+                        constantUpdate();
+                        if (isAnimEnable()) {
+                            updateThreadHandler.sendEmptyMessageDelayed(0, REFRESH_SLEEP_TIME);
                         }
                         break;
                 }
                 return false;
             }
         });
-        mHandler.sendEmptyMessage(0);
+        updateThreadHandler.sendEmptyMessage(0);
+    }
+
+    private void initAnimThread() {
         animThread = new AnimThread();
         animThread.start();
     }
 
-    private void constantUpdate(long frameDuration) {
-//        if (mDrawTime <= REFRESH_SLEEP_TIME) {
+    private void constantUpdate() {
         synchronized (lockObj) {
             lockObj.notify();
         }
-//        } else {
-//            Log.e("@@@", "stay frame");
-//            mDrawTime -= REFRESH_SLEEP_TIME;
-//        }
     }
 
     @Override
@@ -152,20 +141,11 @@ public class EFSurfaceView extends EFSurfaceViewBase implements SurfaceHolder.Ca
 
     @Override
     public void surfaceDestroyed(SurfaceHolder surfaceHolder) {
-        disableKeyFrameAnim();
-        mHandler.removeCallbacksAndMessages("update");
-        handlerThread.quit();
+        disableAnim();
+        updateThreadHandler.removeCallbacksAndMessages("update");
+        updateThread.quit();
     }
 
-    /*
-    * 初始化图片资源
-    * */
-    protected void initSprite() {
-    }
-
-    /*
-    * 初始化SurfaceHolder
-    * */
     protected void initSurfaceHolder(SurfaceHolder surfaceHolder) {
     }
 
@@ -173,32 +153,77 @@ public class EFSurfaceView extends EFSurfaceViewBase implements SurfaceHolder.Ca
 
         @Override
         public void run() {
-            while (isKeyFrameEnable()) {
-                long startTime = System.currentTimeMillis();
+            while (isAnimEnable()) {
+                long beforeDrawTime = System.currentTimeMillis();
                 try {
                     mCanvas = mSurfaceHolder.lockCanvas();
-                    EFScheduler.getInstance().update((int) mDeltaTime, mCanvas, mDefaultPaint);
-                    mCanvas.drawText("Base :" + mAverageFrameRate, 0, 150, mTextPaint);
+                    long deltaTime = System.currentTimeMillis() - mLastDeltaTime;
+//                    Log.e(LOG_TAG,"delta time = "+ deltaTime);
+                    mLastDeltaTime = System.currentTimeMillis();
+                    EFScheduler.getInstance().onCanvasUpdate((int) deltaTime, mCanvas, mDefaultPaint);
+                    mCanvas.drawText(getInfo(), 0, 150, mTextPaint);
                 } catch (Exception e) {
-                    Log.d("eflake", e.toString());
+                    Log.d(LOG_TAG, e.toString());
                 } finally {
                     if (mCanvas != null) {
                         try {
-                            long waitTime = System.currentTimeMillis();
-                            mDrawTime = (System.currentTimeMillis() - startTime);
-//                            Log.e("&&&", "drawTime = " + String.valueOf(mDrawTime));
+                            long beforeWaitTime = System.currentTimeMillis();
+                            calculateCanvasDrawTime(beforeDrawTime);
                             synchronized (lockObj) {
                                 lockObj.wait();
                             }
-//                            Log.e("&&&", "wait time = " + String.valueOf(System.currentTimeMillis() - waitTime));
+                            calculateCanvasFrequency();
+                            calculateWaitTime(beforeWaitTime);
+                            long beforeUnlockTime = System.currentTimeMillis();
                             mSurfaceHolder.unlockCanvasAndPost(mCanvas);
-//                            mDrawTime = 0;
+//                            Log.e(LOG_TAG,"unlock cost time = "+ String.valueOf(System.currentTimeMillis()- beforeUnlockTime));
                         } catch (InterruptedException e) {
                             e.printStackTrace();
                         }
                     }
                 }
             }
+        }
+    }
+
+    private String getInfo() {
+        return "帧率 :" + mAverageCanvasUnlockFrameRate + " " +
+                "平均计算绘制时间: "  + mCanvasDrawTime;
+//                + " " + "平均等待时间 :" + mCanvasWaitTime;
+    }
+
+    private void calculateCanvasDrawTime(long beforeDrawTime) {
+        mCanvasDrawTimeCount++;
+        mCanvasDrawSum += System.currentTimeMillis() - beforeDrawTime;
+        if (mCanvasDrawTimeCount == CAL_SAMPLE_TIME) {
+            mCanvasDrawTime = String.valueOf(mCanvasDrawSum / mCanvasDrawTimeCount);
+            mCanvasDrawTimeCount = 0;
+            mCanvasDrawSum = 0;
+        }
+    }
+
+    private void calculateWaitTime(long beforeWaitTime) {
+        mCanvasWaitTimeCount++;
+        mCanvasWaitSum += System.currentTimeMillis() - beforeWaitTime;
+        if (mCanvasWaitTimeCount == CAL_SAMPLE_TIME) {
+            mCanvasWaitTime = String.valueOf(mCanvasWaitSum / mCanvasWaitTimeCount);
+            mCanvasWaitTimeCount = 0;
+            mCanvasWaitSum = 0;
+        }
+    }
+
+    private void calculateCanvasFrequency() {
+        long canvasUnlockOnceDuration = System.currentTimeMillis() - mLastCanvasUnlockTime;
+        mLastCanvasUnlockTime = System.currentTimeMillis();
+        long canvasUnlockCalDuration = System.currentTimeMillis() - mLastCanvasUnlockCalTime;
+        long canvasUnlockRate = 1000 / canvasUnlockOnceDuration;
+        mCanvasUnlockRateCount++;
+        mCanvasUnlockRateSum += canvasUnlockRate;
+        if (canvasUnlockCalDuration >= 1000) {
+            mLastCanvasUnlockCalTime = System.currentTimeMillis();
+            mAverageCanvasUnlockFrameRate = String.valueOf(mCanvasUnlockRateSum / mCanvasUnlockRateCount);
+            mCanvasUnlockRateCount = 0;
+            mCanvasUnlockRateSum = 0;
         }
     }
 

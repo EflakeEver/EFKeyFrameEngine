@@ -51,13 +51,6 @@ public class EFScheduler implements IEFScheduler {
         change.setType(EFSchedulerChange.TYPE_ADD);
         change.setKey(String.valueOf(observer.hashCode()));
         observerChanges.add(change);
-
-//        if (observers.containsKey(observer)) {
-//            return false;
-//        }
-//
-//        observers.put(observer.hashCode() + "", observer);
-
         return true;
     }
 
@@ -66,30 +59,22 @@ public class EFScheduler implements IEFScheduler {
         if (observer == null) {
             return false;
         }
-
         EFSchedulerChange change = new EFSchedulerChange();
         change.setIEFUpdate(observer);
         change.setType(EFSchedulerChange.TYPE_REMOVE);
         change.setKey(String.valueOf(observer.hashCode()));
         observerChanges.add(change);
-
-//        if (!observers.containsKey(observer)) {
-//            return false;
-//        }
-//
-//        observers.remove(observer.hashCode());
         return true;
     }
 
     /*
     * Canvas刷新回调用此方法,通知需要显示的所有EFNode对象
     * */
-    public void update(int deltaTime, Canvas canvas, Paint defaultPaint) {
-        long oldUpdateTime = System.currentTimeMillis();
+    public void onCanvasUpdate(int deltaTime, Canvas canvas, Paint defaultPaint) {
+//        long oldUpdateTime = System.currentTimeMillis();
         Iterator updateIterator = observers.entrySet().iterator();
         while (updateIterator.hasNext()) {
             Map.Entry<String, IEFUpdate> entry = (Map.Entry<String, IEFUpdate>) updateIterator.next();
-            String key = entry.getKey();
             IEFUpdate observer = entry.getValue();
             if (!observer.isPaused()) {
                 observer.update(deltaTime);
@@ -110,9 +95,10 @@ public class EFScheduler implements IEFScheduler {
                 observer.draw(canvas, defaultPaint);
             }
         }
-
-        applyObserverChange();
 //        Log.e(TAG, "draw cost time = " + String.valueOf(System.currentTimeMillis() - oldUpdateTime));
+        long applyChangeTime = System.currentTimeMillis();
+        applyObserverChange();
+        //        Log.e(TAG, "apply change cost time = " + String.valueOf(System.currentTimeMillis() - applyChangeTime));
     }
 
     private void applyObserverChange() {
@@ -135,6 +121,5 @@ public class EFScheduler implements IEFScheduler {
             observerChanges.clear();
         }
     }
-
 
 }
