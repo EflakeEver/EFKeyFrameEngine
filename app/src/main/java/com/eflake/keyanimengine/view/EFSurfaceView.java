@@ -25,7 +25,7 @@ public class EFSurfaceView extends EFSurfaceViewBase implements SurfaceHolder.Ca
     private Handler updateThreadHandler;
     public static final String UPDATE_THREAD_NAME = "update_thread";
     public static final int UPDATE_EVENT = 0;//更新事件
-    private static final long REFRESH_SLEEP_TIME = 10; //更新频率
+    private static final long REFRESH_SLEEP_TIME = 33; //更新频率
     //canvas相关
     protected int mCanvasWidth;
     protected int mCanvasHeight;
@@ -37,19 +37,36 @@ public class EFSurfaceView extends EFSurfaceViewBase implements SurfaceHolder.Ca
     protected Thread animThread;
     public final Object lockObj = new Object();
     //计算相关
-    private String mAverageCanvasUnlockFrameRate;//Canvas绘制帧率
     private String mCanvasWaitTime;//线程等待时间
-    private String mCanvasDrawTime;//绘制计算时间
+    private String mCanvasCostAllTime;//绘制计算时间
     private long mLastCanvasUnlockTime;
     private long mLastCanvasUnlockCalTime;
     private int mCanvasUnlockRateCount;
     private long mCanvasUnlockRateSum;
-    private int mCanvasDrawTimeCount;
-    private long mCanvasDrawSum;
+    private int mCanvasCostAllTimeCount;
+    private long mCanvasCostAllSum;
     private int mCanvasWaitTimeCount;
     private long mCanvasWaitSum;
     protected Context mContext;
     private long mLastDeltaTime;
+    private long mCanvaseUpdateSum;
+    private long mCanvaseDrawSum;
+    private String mCanvasUpdateTime;
+    private String mCanvasDrawTime;
+    private int mCanvasLockTimeCount;
+    private long mCanvasLockSum;
+    private String mCanvasLockTime;
+    private long mLockDuration;
+    private long mAllDuration;
+    private long mUpdateDuration;
+    private long mDrawDuration;
+    private long mWaitDuration;
+    private long mUnlockDuration;
+    private long mCanvasUnlockSum;
+    private String mCanvasUnlockTime;
+    private long mFrameRateSum;
+    private String mCanvasRate;
+    private int mTextHeight;
 
     public EFSurfaceView(Context context, int width, int height) {
         this(context);
@@ -88,7 +105,7 @@ public class EFSurfaceView extends EFSurfaceViewBase implements SurfaceHolder.Ca
         mDefaultPaint.setTextSize(mContext.getResources().getDimensionPixelSize(R.dimen.default_txt_size));
         mTextPaint = new Paint();
         mTextPaint.setColor(0xff000000);
-        mTextPaint.setTextSize(55);
+        mTextPaint.setTextSize(mContext.getResources().getDimensionPixelSize(R.dimen.default_paint_text_size));
     }
 
     /*
@@ -154,77 +171,110 @@ public class EFSurfaceView extends EFSurfaceViewBase implements SurfaceHolder.Ca
         @Override
         public void run() {
             while (isAnimEnable()) {
-                long beforeDrawTime = System.currentTimeMillis();
                 try {
+                    long beforeWaitTime = System.currentTimeMillis();
+                    synchronized (lockObj) {
+                        lockObj.wait();
+                    }
+                    mWaitDuration = System.currentTimeMillis() - beforeWaitTime;
+                    long beforeLockTime = System.currentTimeMillis();
                     mCanvas = mSurfaceHolder.lockCanvas();
-                    long deltaTime = System.currentTimeMillis() - mLastDeltaTime;
-//                    Log.e(LOG_TAG,"delta time = "+ deltaTime);
+//                    Log.e(LOG_TAG, "lock time = " + String.valueOf(System.currentTimeMillis() - beforeLockTime));
+                    mLockDuration = System.currentTimeMillis() - beforeLockTime;
+                    mAllDuration = System.currentTimeMillis() - mLastDeltaTime;
+//                    Log.e(LOG_TAG, "allDuration time = " + mAllDuration);
                     mLastDeltaTime = System.currentTimeMillis();
-                    EFScheduler.getInstance().onCanvasUpdate((int) deltaTime, mCanvas, mDefaultPaint);
-                    mCanvas.drawText(getInfo(), 0, 150, mTextPaint);
+                    long beforeUpdateTime = System.currentTimeMillis();
+                    EFScheduler.getInstance().onCanvasUpdate(mAllDuration);
+                    mUpdateDuration = System.currentTimeMillis() - beforeUpdateTime;
+//                    Log.e("LOG_TAG", "update cost time = " + String.valueOf(updateDuration));
+                    long beforeDrawTime = System.currentTimeMillis();
+                    EFScheduler.getInstance().onCanvasDraw(mCanvas, mDefaultPaint);
+                    mDrawDuration = System.currentTimeMillis() - beforeDrawTime;
+//                    Log.e("LOG_TAG, "draw cost time = " + String.valueOf(System.currentTimeMillis() - beforeDrawTime));
+                    mTextHeight = mContext.getResources().getDimensionPixelSize(R.dimen.default_paint_text_size);
+                    mCanvas.drawText(getFrameInfo(), 0, mTextHeight*5, mTextPaint);
+                    mCanvas.drawText(getAnimAllCostInfo(), 0, mTextHeight *6 , mTextPaint);
+                    mCanvas.drawText(getUpdateInfo(), 0, mTextHeight * 7, mTextPaint);
+                    mCanvas.drawText(getDrawInfo(), 0, mTextHeight* 8, mTextPaint);
+                    mCanvas.drawText(getWaitInfo(), 0, mTextHeight * 9, mTextPaint);
+                    mCanvas.drawText(getCanvasLockInfo(), 0, mTextHeight* 10, mTextPaint);
+                    mCanvas.drawText(getCanvasUnlockInfo(), 0, mTextHeight* 11, mTextPaint);
                 } catch (Exception e) {
                     Log.d(LOG_TAG, e.toString());
                 } finally {
                     if (mCanvas != null) {
-                        try {
-                            long beforeWaitTime = System.currentTimeMillis();
-                            calculateCanvasDrawTime(beforeDrawTime);
-                            synchronized (lockObj) {
-                                lockObj.wait();
-                            }
-                            calculateCanvasFrequency();
-                            calculateWaitTime(beforeWaitTime);
+//                        try {
+//                            Log.e(LOG_TAG, "wait cost time = " + String.valueOf(waitDuration));
                             long beforeUnlockTime = System.currentTimeMillis();
                             mSurfaceHolder.unlockCanvasAndPost(mCanvas);
-//                            Log.e(LOG_TAG,"unlock cost time = "+ String.valueOf(System.currentTimeMillis()- beforeUnlockTime));
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
+                            mUnlockDuration = System.currentTimeMillis() - beforeUnlockTime;
+                            calculateCostTime(mAllDuration, mLockDuration, mUpdateDuration, mDrawDuration, mWaitDuration, mUnlockDuration);
+//                            Log.e(LOG_TAG, "unlock cost time = " + String.valueOf(System.currentTimeMillis() - beforeUnlockTime));
+//                        } catch (InterruptedException e) {
+//                            e.printStackTrace();
+//                        }
                     }
                 }
             }
         }
     }
 
-    private String getInfo() {
-        return "帧率 :" + mAverageCanvasUnlockFrameRate + " " +
-                "平均计算绘制时间: "  + mCanvasDrawTime;
-//                + " " + "平均等待时间 :" + mCanvasWaitTime;
-    }
+    private void calculateCostTime(long allDuration, long lockDuration, long updateDuration, long drawDuration, long waitDuration, long unlockTime) {
+        mCanvasCostAllTimeCount++;
+        mCanvasCostAllSum += allDuration;
+        mCanvaseUpdateSum += updateDuration;
+        mCanvaseDrawSum += drawDuration;
+        mCanvasWaitSum += waitDuration;
+        mCanvasLockSum += lockDuration;
+        mCanvasUnlockSum += unlockTime;
+        long frameRate = 1000 / allDuration;
+        mFrameRateSum += frameRate;
 
-    private void calculateCanvasDrawTime(long beforeDrawTime) {
-        mCanvasDrawTimeCount++;
-        mCanvasDrawSum += System.currentTimeMillis() - beforeDrawTime;
-        if (mCanvasDrawTimeCount == CAL_SAMPLE_TIME) {
-            mCanvasDrawTime = String.valueOf(mCanvasDrawSum / mCanvasDrawTimeCount);
-            mCanvasDrawTimeCount = 0;
-            mCanvasDrawSum = 0;
-        }
-    }
-
-    private void calculateWaitTime(long beforeWaitTime) {
-        mCanvasWaitTimeCount++;
-        mCanvasWaitSum += System.currentTimeMillis() - beforeWaitTime;
-        if (mCanvasWaitTimeCount == CAL_SAMPLE_TIME) {
-            mCanvasWaitTime = String.valueOf(mCanvasWaitSum / mCanvasWaitTimeCount);
-            mCanvasWaitTimeCount = 0;
+        if (mCanvasCostAllTimeCount == CAL_SAMPLE_TIME) {
+            mCanvasCostAllTime = String.valueOf(mCanvasCostAllSum / mCanvasCostAllTimeCount);
+            mCanvasUpdateTime = String.valueOf(mCanvaseUpdateSum / mCanvasCostAllTimeCount);
+            mCanvasDrawTime = String.valueOf(mCanvaseDrawSum / mCanvasCostAllTimeCount);
+            mCanvasLockTime = String.valueOf(mCanvasLockSum / mCanvasCostAllTimeCount);
+            mCanvasUnlockTime = String.valueOf(mCanvasUnlockSum / mCanvasCostAllTimeCount);
+            mCanvasWaitTime = String.valueOf(mCanvasWaitSum / mCanvasCostAllTimeCount);
+            mCanvasRate = String.valueOf(mFrameRateSum / mCanvasCostAllTimeCount);
+            mCanvasCostAllTimeCount = 0;
+            mCanvasCostAllSum = 0;
+            mCanvaseDrawSum = 0;
+            mCanvaseUpdateSum = 0;
             mCanvasWaitSum = 0;
+            mCanvasUnlockSum = 0;
+            mCanvasLockSum = 0;
+            mFrameRateSum = 0;
         }
     }
 
-    private void calculateCanvasFrequency() {
-        long canvasUnlockOnceDuration = System.currentTimeMillis() - mLastCanvasUnlockTime;
-        mLastCanvasUnlockTime = System.currentTimeMillis();
-        long canvasUnlockCalDuration = System.currentTimeMillis() - mLastCanvasUnlockCalTime;
-        long canvasUnlockRate = 1000 / canvasUnlockOnceDuration;
-        mCanvasUnlockRateCount++;
-        mCanvasUnlockRateSum += canvasUnlockRate;
-        if (canvasUnlockCalDuration >= 1000) {
-            mLastCanvasUnlockCalTime = System.currentTimeMillis();
-            mAverageCanvasUnlockFrameRate = String.valueOf(mCanvasUnlockRateSum / mCanvasUnlockRateCount);
-            mCanvasUnlockRateCount = 0;
-            mCanvasUnlockRateSum = 0;
-        }
+    private String getDrawInfo() {
+        return "平均渲染耗时: " + mCanvasDrawTime;
     }
 
+    private String getUpdateInfo() {
+        return "平均计算耗时: " + mCanvasUpdateTime;
+    }
+
+    private String getAnimAllCostInfo() {
+        return "平均总耗时: " + mCanvasCostAllTime;
+    }
+
+    private String getFrameInfo() {
+        return "平均帧率 :" + mCanvasRate;
+    }
+
+    private String getWaitInfo() {
+        return "平均等待时间 :" + mCanvasWaitTime;
+    }
+
+    private String getCanvasUnlockInfo() {
+        return "平均Canvas-Unlock耗时: " + mCanvasUnlockTime;
+    }
+
+    private String getCanvasLockInfo() {
+        return "平均Canvas-Lock耗时: " + mCanvasLockTime;
+    }
 }

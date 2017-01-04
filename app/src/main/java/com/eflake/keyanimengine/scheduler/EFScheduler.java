@@ -71,34 +71,6 @@ public class EFScheduler implements IEFScheduler {
     * Canvas刷新回调用此方法,通知需要显示的所有EFNode对象
     * */
     public void onCanvasUpdate(int deltaTime, Canvas canvas, Paint defaultPaint) {
-//        long oldUpdateTime = System.currentTimeMillis();
-        Iterator updateIterator = observers.entrySet().iterator();
-        while (updateIterator.hasNext()) {
-            Map.Entry<String, IEFUpdate> entry = (Map.Entry<String, IEFUpdate>) updateIterator.next();
-            IEFUpdate observer = entry.getValue();
-            if (!observer.isPaused()) {
-                observer.update(deltaTime);
-            }
-        }
-//        Log.e(TAG, "update cost time = " + String.valueOf(System.currentTimeMillis() - oldUpdateTime));
-        long oldDrawTime = System.currentTimeMillis();
-        //清屏操作
-        defaultPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
-        canvas.drawPaint(defaultPaint);
-        defaultPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_OVER));
-
-        Iterator drawIterator = observers.entrySet().iterator();
-        while (drawIterator.hasNext()) {
-            Map.Entry<String, IEFUpdate> entry = (Map.Entry<String, IEFUpdate>) drawIterator.next();
-            IEFUpdate observer = entry.getValue();
-            if (!observer.isPaused()) {
-                observer.draw(canvas, defaultPaint);
-            }
-        }
-//        Log.e(TAG, "draw cost time = " + String.valueOf(System.currentTimeMillis() - oldUpdateTime));
-        long applyChangeTime = System.currentTimeMillis();
-        applyObserverChange();
-        //        Log.e(TAG, "apply change cost time = " + String.valueOf(System.currentTimeMillis() - applyChangeTime));
     }
 
     private void applyObserverChange() {
@@ -122,4 +94,36 @@ public class EFScheduler implements IEFScheduler {
         }
     }
 
+    public void onCanvasUpdate(long deltaTime) {
+        long oldUpdateTime = System.currentTimeMillis();
+        Iterator updateIterator = observers.entrySet().iterator();
+        while (updateIterator.hasNext()) {
+            Map.Entry<String, IEFUpdate> entry = (Map.Entry<String, IEFUpdate>) updateIterator.next();
+            IEFUpdate observer = entry.getValue();
+            if (!observer.isPaused()) {
+                observer.update((int) deltaTime);
+            }
+        }
+    }
+
+    public void onCanvasDraw(Canvas canvas, Paint defaultPaint) {
+        long oldDrawTime = System.currentTimeMillis();
+        //清屏操作
+        defaultPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
+        canvas.drawPaint(defaultPaint);
+        defaultPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_OVER));
+
+        Iterator drawIterator = observers.entrySet().iterator();
+        while (drawIterator.hasNext()) {
+            Map.Entry<String, IEFUpdate> entry = (Map.Entry<String, IEFUpdate>) drawIterator.next();
+            IEFUpdate observer = entry.getValue();
+            if (!observer.isPaused()) {
+                observer.draw(canvas, defaultPaint);
+            }
+        }
+//        Log.e(TAG, "draw cost time = " + String.valueOf(System.currentTimeMillis() - oldUpdateTime));
+        long applyChangeTime = System.currentTimeMillis();
+        applyObserverChange();
+        //        Log.e(TAG, "apply change cost time = " + String.valueOf(System.currentTimeMillis() - applyChangeTime));
+    }
 }

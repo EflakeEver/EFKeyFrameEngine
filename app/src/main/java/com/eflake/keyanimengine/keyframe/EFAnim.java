@@ -3,6 +3,7 @@ package com.eflake.keyanimengine.keyframe;
 
 import android.graphics.Canvas;
 import android.graphics.Paint;
+import android.util.Log;
 
 import com.eflake.keyanimengine.utils.ScreenDimenUtils;
 
@@ -65,12 +66,14 @@ public class EFAnim implements IEFAnim {
 
     @Override
     public void step(long deltaTime) {
+//        long beforeStep = System.currentTimeMillis();
         Iterator<Map.Entry<String, EFElement>> iterator = mElements.entrySet().iterator();
         while (iterator.hasNext()) {
             Map.Entry<String, EFElement> entry = iterator.next();
             entry.getValue().updateAnim(mElapsedFrame);
         }
         mElapsedFrame++;
+//        long stepCost = System.currentTimeMillis() - beforeStep;
     }
 
     @Override
@@ -112,11 +115,14 @@ public class EFAnim implements IEFAnim {
 
     @Override
     public void draw(Canvas canvas, Paint defaultPaint) {
+        long beforeDraw = System.currentTimeMillis();
         Iterator<Map.Entry<String, EFElement>> iterator = mElements.entrySet().iterator();
         while (iterator.hasNext()) {
             Map.Entry<String, EFElement> entry = iterator.next();
             entry.getValue().draw(canvas, defaultPaint);
         }
+        long drawCost = System.currentTimeMillis() - beforeDraw;
+        Log.e("@@", "drawCost = " + drawCost);
     }
 
     public void onAnimDone() {

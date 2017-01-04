@@ -12,7 +12,6 @@ import java.io.File;
 
 import static android.content.ContentValues.TAG;
 import static com.eflake.keyanimengine.sprite.EFSpriteFrameCache.KSYUN_FRAMES;
-import static com.eflake.keyanimengine.view.TransparentSurfaceView.PNG;
 
 /**
  * 工具类
@@ -21,6 +20,7 @@ import static com.eflake.keyanimengine.view.TransparentSurfaceView.PNG;
  */
 public class LoadImgUtils {
     public static int ScaleRadio = 1;
+    public static final String PNG = ".png";
 
     /*
     * dp转px
