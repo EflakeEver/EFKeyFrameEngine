@@ -6,6 +6,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
 
@@ -88,7 +89,7 @@ public class MainActivity extends AppCompatActivity {
         if (mSequenceAnimEnable) {
             mSequenceAnimEnable = false;
             String animDirPath = Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + "yinke_motor";  //json文件和动画图片所在的文件夹
-            String jsonPath = animDirPath + File.separator + "yinke_moto_bezier_json.json";
+            String jsonPath = animDirPath + File.separator + "car.json";
             String animJson = JsonUtil.readFile(jsonPath, this);
             AnimEntity animEntity = JsonUtil.jsonTobean(animJson, AnimEntity.class);
             final EFAnim anim1 = new EFAnim();

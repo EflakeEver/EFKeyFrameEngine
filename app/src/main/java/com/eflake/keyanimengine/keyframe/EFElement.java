@@ -622,10 +622,11 @@ public class EFElement extends EFSprite implements IEFElement {
     public void draw(Canvas canvas, Paint defaultPaint) {
         //TODO 不同的元素，应采用不同画笔
         defaultPaint.setAlpha((int) mRealAlpha);
+        long beforeAlpha = System.currentTimeMillis();
         if (canvas != null) {
             canvas.drawBitmap(mBitmap, mMatrix, defaultPaint);
         }
+        Log.e("##","element :"+mName+",draw time = "+ String.valueOf(System.currentTimeMillis() - beforeAlpha));
     }
-
 
 }

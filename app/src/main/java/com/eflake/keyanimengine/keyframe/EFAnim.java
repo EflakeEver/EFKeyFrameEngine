@@ -66,14 +66,14 @@ public class EFAnim implements IEFAnim {
 
     @Override
     public void step(long deltaTime) {
-//        long beforeStep = System.currentTimeMillis();
+        long beforeStep = System.currentTimeMillis();
         Iterator<Map.Entry<String, EFElement>> iterator = mElements.entrySet().iterator();
         while (iterator.hasNext()) {
             Map.Entry<String, EFElement> entry = iterator.next();
             entry.getValue().updateAnim(mElapsedFrame);
         }
         mElapsedFrame++;
-//        long stepCost = System.currentTimeMillis() - beforeStep;
+        long stepCost = System.currentTimeMillis() - beforeStep;
     }
 
     @Override

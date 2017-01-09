@@ -193,23 +193,23 @@ public class EFSurfaceView extends EFSurfaceViewBase implements SurfaceHolder.Ca
                     mDrawDuration = System.currentTimeMillis() - beforeDrawTime;
 //                    Log.e("LOG_TAG, "draw cost time = " + String.valueOf(System.currentTimeMillis() - beforeDrawTime));
                     mTextHeight = mContext.getResources().getDimensionPixelSize(R.dimen.default_paint_text_size);
-                    mCanvas.drawText(getFrameInfo(), 0, mTextHeight*5, mTextPaint);
-                    mCanvas.drawText(getAnimAllCostInfo(), 0, mTextHeight *6 , mTextPaint);
+                    mCanvas.drawText(getFrameInfo(), 0, mTextHeight * 5, mTextPaint);
+                    mCanvas.drawText(getAnimAllCostInfo(), 0, mTextHeight * 6, mTextPaint);
                     mCanvas.drawText(getUpdateInfo(), 0, mTextHeight * 7, mTextPaint);
-                    mCanvas.drawText(getDrawInfo(), 0, mTextHeight* 8, mTextPaint);
+                    mCanvas.drawText(getDrawInfo(), 0, mTextHeight * 8, mTextPaint);
                     mCanvas.drawText(getWaitInfo(), 0, mTextHeight * 9, mTextPaint);
-                    mCanvas.drawText(getCanvasLockInfo(), 0, mTextHeight* 10, mTextPaint);
-                    mCanvas.drawText(getCanvasUnlockInfo(), 0, mTextHeight* 11, mTextPaint);
+                    mCanvas.drawText(getCanvasLockInfo(), 0, mTextHeight * 10, mTextPaint);
+                    mCanvas.drawText(getCanvasUnlockInfo(), 0, mTextHeight * 11, mTextPaint);
                 } catch (Exception e) {
                     Log.d(LOG_TAG, e.toString());
                 } finally {
                     if (mCanvas != null) {
 //                        try {
 //                            Log.e(LOG_TAG, "wait cost time = " + String.valueOf(waitDuration));
-                            long beforeUnlockTime = System.currentTimeMillis();
-                            mSurfaceHolder.unlockCanvasAndPost(mCanvas);
-                            mUnlockDuration = System.currentTimeMillis() - beforeUnlockTime;
-                            calculateCostTime(mAllDuration, mLockDuration, mUpdateDuration, mDrawDuration, mWaitDuration, mUnlockDuration);
+                        long beforeUnlockTime = System.currentTimeMillis();
+                        mSurfaceHolder.unlockCanvasAndPost(mCanvas);
+                        mUnlockDuration = System.currentTimeMillis() - beforeUnlockTime;
+                        calculateCostTime(mAllDuration, mLockDuration, mUpdateDuration, mDrawDuration, mWaitDuration, mUnlockDuration);
 //                            Log.e(LOG_TAG, "unlock cost time = " + String.valueOf(System.currentTimeMillis() - beforeUnlockTime));
 //                        } catch (InterruptedException e) {
 //                            e.printStackTrace();
